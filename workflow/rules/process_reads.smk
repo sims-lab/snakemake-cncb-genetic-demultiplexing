@@ -45,8 +45,8 @@ rule bwa_mem:
         "logs/bwa_mem/{sample}.log",
     params:
         extra=r"-R '@RG\tID:{sample}\tSM:{sample}'",
-        sorting="samtools",  # Can be 'none', 'samtools' or 'picard'.
-        sort_order="coordinate",  # Can be 'queryname' or 'coordinate'.
+        sorting="none",  # Can be 'none', 'samtools' or 'picard'.
+        sort_order="queryname",  # Can be 'queryname' or 'coordinate'.
         sort_extra="",  # Extra args for samtools/picard.
     threads: 8
     resources:
@@ -56,11 +56,25 @@ rule bwa_mem:
         "v7.2.0/bio/bwa/mem"
 
 
-rule samtools_index:
+rule samtools_sort:
     input:
         "results/bwa_mem/{sample}.bam",
     output:
-        "results/bwa_mem/{sample}.bam.bai",
+        "results/samtools_sort/{sample}.sorted.bam",
+    log:
+        "logs/samtools_sort/{sample}.log",
+    params:
+        extra="-m 4G",
+    threads: 8
+    wrapper:
+        "v7.2.0/bio/samtools/sort"
+
+
+rule samtools_index:
+    input:
+        "results/samtools_sort/{sample}.sorted.bam",
+    output:
+        "results/samtools_sort/{sample}.sorted.bam.bai",
     log:
         "logs/samtools_index/{sample}.log",
     params:
@@ -72,9 +86,9 @@ rule samtools_index:
 
 rule samtools_flagstat:
     input:
-        "results/bwa_mem/{sample}.bam",
+        "results/bwa_mem/{sample}.sorted.bam",
     output:
-        "results/samtools_flagstat/{sample}.txt",
+        "results/samtools_flagstat/{sample}.flagstat",
     log:
         "logs/samtools_flagstat/{sample}.log",
     params:
@@ -85,8 +99,8 @@ rule samtools_flagstat:
 
 rule samtools_idxstats:
     input:
-        bam="results/bwa_mem/{sample}.bam",
-        idx="results/bwa_mem/{sample}.bam.bai",
+        bam="results/samtools_sort/{sample}.sorted.bam",
+        idx="results/samtools_sort/{sample}.sorted.bam.bai",
     output:
         "results/samtools_idxstats/{sample}.idxstats",
     log:
@@ -99,7 +113,7 @@ rule samtools_idxstats:
 
 rule multiqc:
     input:
-        expand("results/samtools_flagstat/{sample}.txt", sample=dnaseq.index.unique()),
+        expand("results/samtools_flagstat/{sample}.flagstat", sample=dnaseq.index.unique()),
         expand("results/samtools_idxstats/{sample}.idxstats", sample=dnaseq.index.unique()),
     output:
         "results/multiqc/qc/multiqc.html",
