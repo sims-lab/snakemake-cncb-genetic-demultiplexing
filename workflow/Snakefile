@@ -33,5 +33,5 @@ onerror:
 # -----------------------------------------------------
 rule all:
     input:
-        "results/multiqc/multiqc_report.html",
+        expand("results/bwa_mem/{sample}.bam", sample=dnaseq.index.unique()),
     default_target: True

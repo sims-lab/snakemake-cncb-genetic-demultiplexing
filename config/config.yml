@@ -1,8 +1,8 @@
-samplesheet: ".test/config/samples.tsv"
+dnaseq_samplesheet: "config/dnaseq.tsv"
 
-get_genome:
-  ncbi_ftp: https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/146/045/GCF_000146045.2_R64/GCF_000146045.2_R64_genomic.fna.gz
+genome:
+  index: "/ceph/project/cncb/albrecht/snakemake-cncb-index-ensembl-genome/results/genome/genome.fa"
 
-simulate_reads:
-  read_length: 100
-  read_number: 10000
+bwa_mem:
+  mem: 16G
+  runtime: 4h
