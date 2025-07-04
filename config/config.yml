@@ -10,3 +10,7 @@ bwa_mem:
 samtools_sort:
   mem: 16G
   runtime: 30m
+
+mark_duplicates:
+  mem: 8GG
+  runtime: 1h

@@ -56,6 +56,34 @@ rule bwa_mem:
         "v7.2.0/bio/bwa/mem"
 
 
+rule mark_duplicates:
+    input:
+        bams="results/bwa_mem/{sample}.bam",
+    # optional to specify a list of BAMs; this has the same effect
+    # of marking duplicates on separate read groups for a sample
+    # and then merging
+    output:
+        bam="results/mark_duplicates/{sample}.bam",
+        metrics="results/mark_duplicates/{sample}.metrics.txt",
+    log:
+        "logs/mark_duplicates/{sample}.log",
+    params:
+        extra="--VALIDATION_STRINGENCY SILENT "
+              "--OPTICAL_DUPLICATE_PIXEL_DISTANCE 2500 "
+              "--ASSUME_SORT_ORDER queryname "
+              "--CLEAR_DT false "
+              "--ADD_PG_TAG_TO_READS false",
+    # optional specification of memory usage of the JVM that snakemake will respect with global
+    # resource restrictions (https://snakemake.readthedocs.io/en/latest/snakefiles/rules.html#resources)
+    # and which can be used to request RAM during cluster job submission as `{resources.mem_mb}`:
+    # https://snakemake.readthedocs.io/en/latest/executing/cluster.html#job-properties
+    threads: 8
+    resources:
+        mem=lookup(within=config, dpath="mark_duplicates/mem"),
+        runtime=lookup(within=config, dpath="mark_duplicates/runtime"),
+    wrapper:
+        "v7.2.0/bio/picard/markduplicates"
+
 rule samtools_sort:
     input:
         "results/bwa_mem/{sample}.bam",
@@ -89,7 +117,7 @@ rule samtools_index:
 
 rule samtools_flagstat:
     input:
-        "results/bwa_mem/{sample}.sorted.bam",
+        "results/samtools_sort/{sample}.sorted.bam",
     output:
         "results/samtools_flagstat/{sample}.flagstat",
     log:
@@ -118,6 +146,7 @@ rule multiqc:
     input:
         expand("results/samtools_flagstat/{sample}.flagstat", sample=dnaseq.index.unique()),
         expand("results/samtools_idxstats/{sample}.idxstats", sample=dnaseq.index.unique()),
+        expand("results/mark_duplicates/{sample}.metrics.txt", sample=dnaseq.index.unique()),
     output:
         "results/multiqc/qc/multiqc.html",
         directory("results/multiqc/qc_data/multiqc_data"),
