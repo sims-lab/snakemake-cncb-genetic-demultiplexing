@@ -1,7 +1,7 @@
 dnaseq_samplesheet: "config/dnaseq.tsv"
 
 genome:
-  index: "/ceph/project/cncb/albrecht/snakemake-cncb-index-ensembl-genome/results/genome/genome.fa"
+  fasta: "/ceph/project/cncb/albrecht/snakemake-cncb-index-ensembl-genome/results/genome/genome.fa"
 
 bwa_mem:
   mem: 16G
@@ -14,3 +14,7 @@ samtools_sort:
 mark_duplicates:
   mem: 8GG
   runtime: 1h
+
+haplotype_caller:
+  mem: 16G
+  runtime: 2h
