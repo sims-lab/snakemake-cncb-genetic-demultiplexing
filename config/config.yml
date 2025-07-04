@@ -6,3 +6,7 @@ genome:
 bwa_mem:
   mem: 16G
   runtime: 1h
+
+samtools_sort:
+  mem: 16G
+  runtime: 30m

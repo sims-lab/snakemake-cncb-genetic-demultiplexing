@@ -64,8 +64,11 @@ rule samtools_sort:
     log:
         "logs/samtools_sort/{sample}.log",
     params:
-        extra="-m 4G",
+        extra="-m 2G",
     threads: 8
+    resources:
+        mem=lookup(within=config, dpath="samtools_sort/mem"),
+        runtime=lookup(within=config, dpath="samtools_sort/runtime"),
     wrapper:
         "v7.2.0/bio/samtools/sort"
 
