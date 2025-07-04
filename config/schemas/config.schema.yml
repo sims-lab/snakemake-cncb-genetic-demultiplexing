@@ -8,10 +8,10 @@ properties:
   genome:
     type: object
     properties:
-      index:
+      fasta:
         type: string
-        description: path to index files
-    required: ["index"]
+        description: path to fasta file (and index files) of the reference genome
+    required: ["fasta"]
 
 required:
   - dnaseq_samplesheet
