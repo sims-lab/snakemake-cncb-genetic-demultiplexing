@@ -5,4 +5,4 @@ genome:
 
 bwa_mem:
   mem: 16G
-  runtime: 4h
+  runtime: 1h

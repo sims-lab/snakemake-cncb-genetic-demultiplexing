@@ -45,8 +45,8 @@ rule bwa_mem:
         "logs/bwa_mem/{sample}.log",
     params:
         extra=r"-R '@RG\tID:{sample}\tSM:{sample}'",
-        sorting="none",  # Can be 'none', 'samtools' or 'picard'.
-        sort_order="queryname",  # Can be 'queryname' or 'coordinate'.
+        sorting="samtools",  # Can be 'none', 'samtools' or 'picard'.
+        sort_order="coordinate",  # Can be 'queryname' or 'coordinate'.
         sort_extra="",  # Extra args for samtools/picard.
     threads: 8
     resources:
@@ -54,3 +54,59 @@ rule bwa_mem:
         runtime=lookup(within=config, dpath="bwa_mem/runtime"),
     wrapper:
         "v7.2.0/bio/bwa/mem"
+
+
+rule samtools_index:
+    input:
+        "results/bwa_mem/{sample}.bam",
+    output:
+        "results/bwa_mem/{sample}.bam.bai",
+    log:
+        "logs/samtools_index/{sample}.log",
+    params:
+        extra="",  # optional params string
+    threads: 4  # This value - 1 will be sent to -@
+    wrapper:
+        "v7.2.0/bio/samtools/index"
+
+
+rule samtools_flagstat:
+    input:
+        "results/bwa_mem/{sample}.bam",
+    output:
+        "results/samtools_flagstat/{sample}.txt",
+    log:
+        "logs/samtools_flagstat/{sample}.log",
+    params:
+        extra="",  # optional params string
+    wrapper:
+        "v7.2.0/bio/samtools/flagstat"
+
+
+rule samtools_idxstats:
+    input:
+        bam="results/bwa_mem/{sample}.bam",
+        idx="results/bwa_mem/{sample}.bam.bai",
+    output:
+        "results/samtools_idxstats/{sample}.idxstats",
+    log:
+        "logs/samtools_idxstats/{sample}.log",
+    params:
+        extra="",  # optional params string
+    wrapper:
+        "v7.2.0/bio/samtools/idxstats"
+
+
+rule multiqc:
+    input:
+        expand("results/samtools_flagstat/{sample}.txt", sample=dnaseq.index.unique()),
+        expand("results/samtools_idxstats/{sample}.idxstats", sample=dnaseq.index.unique()),
+    output:
+        "results/multiqc/qc/multiqc.html",
+        directory("results/multiqc/qc_data/multiqc_data"),
+    params:
+        extra="--verbose",  # Optional: extra parameters for multiqc.
+    log:
+        "logs/multiqc.log",
+    wrapper:
+        "v7.2.0/bio/multiqc"
