@@ -40,7 +40,7 @@ rule bwa_mem:
         ),
         idx=multiext(config["genome"]["index"], ".amb", ".ann", ".bwt", ".pac", ".sa"),
     output:
-        "results/bwa_mem/{sample}.bam",
+        "results/bwa_mem/{sample}.unsorted.bam",
     log:
         "logs/bwa_mem/{sample}.log",
     params:
@@ -58,12 +58,12 @@ rule bwa_mem:
 
 rule mark_duplicates:
     input:
-        bams="results/bwa_mem/{sample}.bam",
+        bams="results/bwa_mem/{sample}.unsorted.bam",
     # optional to specify a list of BAMs; this has the same effect
     # of marking duplicates on separate read groups for a sample
     # and then merging
     output:
-        bam="results/mark_duplicates/{sample}.bam",
+        bam="results/mark_duplicates/{sample}.unsorted.bam",
         metrics="results/mark_duplicates/{sample}.metrics.txt",
     log:
         "logs/mark_duplicates/{sample}.log",
@@ -86,9 +86,9 @@ rule mark_duplicates:
 
 rule samtools_sort:
     input:
-        "results/bwa_mem/{sample}.bam",
+        "results/mark_duplicates/{sample}.unsorted.bam",
     output:
-        "results/samtools_sort/{sample}.sorted.bam",
+        "results/samtools_sort/{sample}.duplicate_marked.bam",
     log:
         "logs/samtools_sort/{sample}.log",
     params:
@@ -103,9 +103,9 @@ rule samtools_sort:
 
 rule samtools_index:
     input:
-        "results/samtools_sort/{sample}.sorted.bam",
+        "results/samtools_sort/{sample}.duplicate_marked.bam",
     output:
-        "results/samtools_sort/{sample}.sorted.bam.bai",
+        "results/samtools_sort/{sample}.duplicate_marked.bam.bai",
     log:
         "logs/samtools_index/{sample}.log",
     params:
@@ -117,9 +117,9 @@ rule samtools_index:
 
 rule samtools_flagstat:
     input:
-        "results/samtools_sort/{sample}.sorted.bam",
+        "results/samtools_sort/{sample}.duplicate_marked.bam",
     output:
-        "results/samtools_flagstat/{sample}.flagstat",
+        "results/samtools_sort/{sample}.flagstat",
     log:
         "logs/samtools_flagstat/{sample}.log",
     params:
@@ -130,10 +130,10 @@ rule samtools_flagstat:
 
 rule samtools_idxstats:
     input:
-        bam="results/samtools_sort/{sample}.sorted.bam",
-        idx="results/samtools_sort/{sample}.sorted.bam.bai",
+        bam="results/samtools_sort/{sample}.duplicate_marked.bam",
+        idx="results/samtools_sort/{sample}.duplicate_marked.bam.bai",
     output:
-        "results/samtools_idxstats/{sample}.idxstats",
+        "results/samtools_sort/{sample}.idxstats",
     log:
         "logs/samtools_idxstats/{sample}.log",
     params:
@@ -144,8 +144,8 @@ rule samtools_idxstats:
 
 rule multiqc:
     input:
-        expand("results/samtools_flagstat/{sample}.flagstat", sample=dnaseq.index.unique()),
-        expand("results/samtools_idxstats/{sample}.idxstats", sample=dnaseq.index.unique()),
+        expand("results/samtools_sort/{sample}.flagstat", sample=dnaseq.index.unique()),
+        expand("results/samtools_sort/{sample}.idxstats", sample=dnaseq.index.unique()),
         expand("results/mark_duplicates/{sample}.metrics.txt", sample=dnaseq.index.unique()),
     output:
         "results/multiqc/qc/multiqc.html",
