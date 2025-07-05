@@ -41,7 +41,7 @@ rule bwa_mem:
         ),
         idx=multiext(config["genome"]["fasta"], ".amb", ".ann", ".bwt", ".pac", ".sa"),
     output:
-        "results/bwa_mem/{sample}.unsorted.bam",
+        "results/bwa_mem/{sample}.bam",
     log:
         "logs/bwa_mem/{sample}.log",
     params:
@@ -60,7 +60,7 @@ rule bwa_mem:
 # https://snakemake-wrappers.readthedocs.io/en/v7.2.0/wrappers/bio/picard/markduplicates.html
 rule mark_duplicates:
     input:
-        bams="results/bwa_mem/{sample}.unsorted.bam",
+        bams="results/bwa_mem/{sample}.bam",
     # optional to specify a list of BAMs; this has the same effect
     # of marking duplicates on separate read groups for a sample
     # and then merging
@@ -90,9 +90,9 @@ rule mark_duplicates:
 # https://snakemake-wrappers.readthedocs.io/en/v7.2.0/wrappers/bio/samtools/sort.html
 rule samtools_sort:
     input:
-        "results/mark_duplicates/{sample}.unsorted.bam",
+        "results/mark_duplicates/{sample}.bam",
     output:
-        "results/samtools_sort/{sample}.duplicate_marked.bam",
+        "results/samtools_sort/{sample}.bam",
     log:
         "logs/samtools_sort/{sample}.log",
     params:
@@ -108,9 +108,9 @@ rule samtools_sort:
 # https://snakemake-wrappers.readthedocs.io/en/v7.2.0/wrappers/bio/samtools/index.html
 rule samtools_index:
     input:
-        "results/samtools_sort/{sample}.duplicate_marked.bam",
+        "results/samtools_sort/{sample}.bam",
     output:
-        "results/samtools_sort/{sample}.duplicate_marked.bam.bai",
+        "results/samtools_sort/{sample}.bam.bai",
     log:
         "logs/samtools_index/{sample}.log",
     params:
@@ -123,7 +123,7 @@ rule samtools_index:
 # https://snakemake-wrappers.readthedocs.io/en/v7.2.0/wrappers/bio/samtools/flagstat.html
 rule samtools_flagstat:
     input:
-        "results/samtools_sort/{sample}.duplicate_marked.bam",
+        "results/samtools_sort/{sample}.bam",
     output:
         "results/samtools_sort/{sample}.flagstat",
     log:
@@ -137,8 +137,8 @@ rule samtools_flagstat:
 # https://snakemake-wrappers.readthedocs.io/en/v7.2.0/wrappers/bio/samtools/idxstats.html
 rule samtools_idxstats:
     input:
-        bam="results/samtools_sort/{sample}.duplicate_marked.bam",
-        idx="results/samtools_sort/{sample}.duplicate_marked.bam.bai",
+        bam="results/samtools_sort/{sample}.bam",
+        idx="results/samtools_sort/{sample}.bam.bai",
     output:
         "results/samtools_sort/{sample}.idxstats",
     log:
@@ -153,7 +153,7 @@ rule samtools_idxstats:
 rule haplotype_caller:
     input:
         # single or list of bam files
-        bam="results/samtools_sort/{sample}.duplicate_marked.bam",
+        bam="results/samtools_sort/{sample}.bam",
         ref=config["genome"]["fasta"],
     output:
         vcf="calls/{sample}.vcf",
