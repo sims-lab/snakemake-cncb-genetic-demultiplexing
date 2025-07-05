@@ -65,8 +65,8 @@ rule mark_duplicates:
     # of marking duplicates on separate read groups for a sample
     # and then merging
     output:
-        bam="results/mark_duplicates/{sample}.unsorted.bam",
-        metrics="results/mark_duplicates/{sample}.unsorted.metrics.txt",
+        bam="results/mark_duplicates/{sample}.bam",
+        metrics="results/mark_duplicates/{sample}.metrics.txt",
     log:
         "logs/mark_duplicates/{sample}.log",
     params:
@@ -175,7 +175,7 @@ rule multiqc:
     input:
         expand("results/samtools_sort/{sample}.flagstat", sample=dnaseq.index.unique()),
         expand("results/samtools_sort/{sample}.idxstats", sample=dnaseq.index.unique()),
-        expand("results/mark_duplicates/{sample}.unsorted.metrics.txt", sample=dnaseq.index.unique()),
+        expand("results/mark_duplicates/{sample}.metrics.txt", sample=dnaseq.index.unique()),
     output:
         "results/multiqc/qc/multiqc.html",
         directory("results/multiqc/qc_data/multiqc_data"),
