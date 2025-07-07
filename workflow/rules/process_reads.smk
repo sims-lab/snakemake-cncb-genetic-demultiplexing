@@ -156,7 +156,7 @@ rule haplotype_caller:
         bam="results/samtools_sort/{sample}.bam",
         ref=config["genome"]["fasta"],
     output:
-        vcf="results/haplotype_caller/{sample}.vcf",
+        vcf="results/haplotype_caller/{sample}.vcf.gz",
     log:
         "logs/haplotype_caller/{sample}.log",
     params:
@@ -176,7 +176,7 @@ rule multiqc:
         expand("results/samtools_sort/{sample}.flagstat", sample=dnaseq.index.unique()),
         expand("results/samtools_sort/{sample}.idxstats", sample=dnaseq.index.unique()),
         expand("results/mark_duplicates/{sample}.metrics.txt", sample=dnaseq.index.unique()),
-        expand("results/haplotype_caller/{sample}.vcf", sample=dnaseq.index.unique()),
+        expand("results/haplotype_caller/{sample}.vcf.gz", sample=dnaseq.index.unique()),
     output:
         "results/multiqc/qc/multiqc.html",
         directory("results/multiqc/qc_data/multiqc_data"),
