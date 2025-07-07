@@ -17,4 +17,4 @@ mark_duplicates:
 
 haplotype_caller:
   mem: 16G
-  runtime: 2h
+  runtime: 3h
