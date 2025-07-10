@@ -2,6 +2,7 @@ dnaseq_samplesheet: "config/dnaseq.tsv"
 
 genome:
   fasta: "/ceph/project/cncb/albrecht/snakemake-cncb-index-ensembl-genome/results/genome/genome.fa"
+  gtf: "/ceph/project/cncb/albrecht/snakemake-cncb-index-ensembl-genome/results/genome/genome.gtf"
 
 bwa_mem:
   mem: 16G

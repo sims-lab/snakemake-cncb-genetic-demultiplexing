@@ -170,6 +170,19 @@ rule haplotype_caller:
         "v7.2.0/bio/gatk/haplotypecaller"
 
 
+rule mrna_bed:
+    input:
+        gtf=config["genome"]["gtf"],
+    output:
+        bed="results/mrna_bed/mRNAs.bed",
+    message:
+        """--- Filter GTF to exons and UTRs."""
+    threads: 1
+    log:
+        "logs/mrna_bed.log",
+    shell:
+        """awk '$3 == "exon" || $3 == "UTR" {{print $1 "\\t" $4 "\\t" $5}}' {input.gtf} > {output.bed} 2> {log}"""
+
 # https://snakemake-wrappers.readthedocs.io/en/v7.2.0/wrappers/bio/multiqc.html
 rule multiqc:
     input:
