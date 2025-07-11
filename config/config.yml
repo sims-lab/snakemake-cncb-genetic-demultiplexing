@@ -19,3 +19,7 @@ mark_duplicates:
 haplotype_caller:
   mem: 16G
   runtime: 4h
+
+bcftools_view:
+  mem: 12G
+  runtime: 10m

@@ -183,13 +183,52 @@ rule mrna_bed:
     shell:
         """awk '$3 == "exon" || $3 == "UTR" {{print $1 "\\t" $4 "\\t" $5}}' {input.gtf} > {output.bed} 2> {log}"""
 
+
+# index VCF files
+# necessary for filter VCF files by region later
+# -----------------------------------------------------
+rule bcftools_index_variants_call:
+    input:
+        "results/haplotype_caller/{sample}.vcf.gz",
+    output:
+        "results/haplotype_caller/{sample}.vcf.gz.csi",
+    log:
+        "logs/bcftools_index_variants_call/{sample}.log",
+    params:
+        extra="",  # optional parameters for bcftools index
+    wrapper:
+        "v7.1.0/bio/bcftools/index"
+
+
+# filter reference VCF file for common exonic SNVs
+# -----------------------------------------------------
+rule filter_coding_snvs:
+    input:
+        "results/haplotype_caller/{sample}.vcf.gz",
+        index="results/haplotype_caller/{sample}.vcf.gz.csi",
+        regions="results/mrna_bed/mRNAs.bed",
+    output:
+        "results/filter_coding_snvs/{sample}.vcf.gz",
+    message:
+        """--- Filtering common variants."""
+    log:
+        "logs/filter_coding_snvs/{sample}.log",
+    params:
+        extra="--exclude-types indels", # TODO: add filter for exonic variants
+    threads: 8,
+    resources:
+        mem=lookup(within=config, dpath="bcftools_view/mem"),
+        runtime=lookup(within=config, dpath="bcftools_view/runtime"),
+    wrapper:
+        "v3.7.0/bio/bcftools/view"
+
 # https://snakemake-wrappers.readthedocs.io/en/v7.2.0/wrappers/bio/multiqc.html
 rule multiqc:
     input:
         expand("results/samtools_sort/{sample}.flagstat", sample=dnaseq.index.unique()),
         expand("results/samtools_sort/{sample}.idxstats", sample=dnaseq.index.unique()),
         expand("results/mark_duplicates/{sample}.metrics.txt", sample=dnaseq.index.unique()),
-        expand("results/haplotype_caller/{sample}.vcf.gz", sample=dnaseq.index.unique()),
+        expand("results/filter_coding_snvs/{sample}.vcf.gz", sample=dnaseq.index.unique()),
     output:
         "results/multiqc/qc/multiqc.html",
         directory("results/multiqc/qc_data/multiqc_data"),
