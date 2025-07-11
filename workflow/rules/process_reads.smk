@@ -197,7 +197,7 @@ rule bcftools_index_variants_call:
     params:
         extra="",  # optional parameters for bcftools index
     wrapper:
-        "v7.1.0/bio/bcftools/index"
+        "v7.2.0/bio/bcftools/index"
 
 
 # filter reference VCF file for common exonic SNVs
@@ -214,13 +214,13 @@ rule filter_coding_snvs:
     log:
         "logs/filter_coding_snvs/{sample}.log",
     params:
-        extra="--exclude-types indels", # TODO: add filter for exonic variants
+        extra="--include 'QUAL>=30' --exclude-types indels",
     threads: 8,
     resources:
         mem=lookup(within=config, dpath="bcftools_view/mem"),
         runtime=lookup(within=config, dpath="bcftools_view/runtime"),
     wrapper:
-        "v3.7.0/bio/bcftools/view"
+        "v7.2.0/bio/bcftools/view"
 
 # https://snakemake-wrappers.readthedocs.io/en/v7.2.0/wrappers/bio/multiqc.html
 rule multiqc:
