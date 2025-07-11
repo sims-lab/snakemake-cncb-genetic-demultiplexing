@@ -185,7 +185,7 @@ rule mrna_bed:
 
 
 # index VCF files
-# necessary for filter VCF files by region later
+# necessary for filtering VCF files by region later
 # -----------------------------------------------------
 rule bcftools_index_variants_call:
     input:
@@ -200,7 +200,7 @@ rule bcftools_index_variants_call:
         "v7.2.0/bio/bcftools/index"
 
 
-# filter reference VCF file for common exonic SNVs
+# filter reference VCF file for exonic SNVs
 # -----------------------------------------------------
 rule filter_coding_snvs:
     input:
@@ -221,6 +221,7 @@ rule filter_coding_snvs:
         runtime=lookup(within=config, dpath="bcftools_view/runtime"),
     wrapper:
         "v7.2.0/bio/bcftools/view"
+
 
 # https://snakemake-wrappers.readthedocs.io/en/v7.2.0/wrappers/bio/multiqc.html
 rule multiqc:
