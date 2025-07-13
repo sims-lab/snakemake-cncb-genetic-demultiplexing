@@ -223,6 +223,52 @@ rule filter_coding_snvs:
         "v7.2.0/bio/bcftools/view"
 
 
+def get_cellranger_count_fastqs(wildcards):
+    # throw error if sample not found
+    if wildcards.id not in scrnaseq.index:
+        raise ValueError(f"Sample {wildcards.id} not found in the sample sheet.")
+    sample_fastqs_info=scrnaseq[scrnaseq['id'] == wildcards.id]
+    fastqs=sample_fastqs_info['path'].iloc[0]
+    return fastqs
+
+
+def get_cellranger_count_sample_names(wildcards):
+    # throw error if sample not found
+    if wildcards.id not in scrnaseq.index:
+        raise ValueError(f"Sample {wildcards.id} not found in the sample sheet.")
+    sample_fastqs_info=scrnaseq[scrnaseq['id'] == wildcards.id]
+    sample=sample_fastqs_info['sample'].iloc[0]
+    return sample
+
+
+rule cellranger_count:
+    input:
+        lambda wildcards: get_cellranger_count_fastqs(wildcards),
+    output:
+        cellranger="results/cellranger_count/{id}",
+    params:
+        genome=config["genome"]["cellranger"],
+        sample=lambda wildcards: get_cellranger_count_sample_names(wildcards),
+    message:
+        """--- Run cellranger count."""
+    threads: lookup(within=config, dpath="cellranger_count/cpus")
+    resources:
+        mem_gb=lookup(within=config, dpath="cellranger_count/mem_gb"),
+        mem=str(lookup(within=config, dpath="cellranger_count/mem_gb")) + "G",
+        runtime=lookup(within=config, dpath="cellranger_count/runtime"),
+        tmpdir="results/cellranger_count/tmp",
+    shell:
+        "cd $TMPDIR && "
+        " cellranger count --id={wildcards.id} "
+        "   --transcriptome={params.genome} "
+        "   --fastqs={input} "
+        "   --sample={params.sample} "
+        "   --create-bam=true "
+        "   --localcores={threads} "
+        "   --localmem={resources.mem_gb} && "
+        " mv $TMPDIR/{wildcards.id} {output.cellranger}"
+
+
 # https://snakemake-wrappers.readthedocs.io/en/v7.2.0/wrappers/bio/multiqc.html
 rule multiqc:
     input:

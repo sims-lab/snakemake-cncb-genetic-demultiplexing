@@ -10,6 +10,11 @@ dnaseq = (
     .sort_index()
 )
 
+scrnaseq = (
+    pd.read_csv(config["scrnaseq_samplesheet"], sep="\t", dtype={"sample": str})
+    .set_index("id", drop=False)
+    .sort_index()
+)
 
 # validate sample sheet and config file
 validate(dnaseq, schema="../../config/schemas/dnaseq.schema.yml")

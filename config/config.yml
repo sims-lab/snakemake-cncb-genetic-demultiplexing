@@ -1,8 +1,10 @@
 dnaseq_samplesheet: "config/dnaseq.tsv"
+scrnaseq_samplesheet: "config/scrnaseq.tsv"
 
 genome:
   fasta: "/ceph/project/cncb/albrecht/snakemake-cncb-index-ensembl-genome/results/genome/genome.fa"
   gtf: "/ceph/project/cncb/albrecht/snakemake-cncb-index-ensembl-genome/results/genome/genome.gtf"
+  cellranger: "/ceph/project/cncb/albrecht/snakemake-cncb-index-ensembl-genome/results/cellranger_mkref"
 
 bwa_mem:
   mem: 16G
@@ -23,3 +25,8 @@ haplotype_caller:
 bcftools_view:
   mem: 12G
   runtime: 10m
+
+cellranger_count:
+  cpus: 20
+  mem_gb: 40
+  runtime: 2h

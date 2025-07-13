@@ -23,7 +23,9 @@ Detailed information about input data and workflow configuration can also be fou
 If you use this workflow in a paper, don't forget to give credits to the authors by citing the URL of this repository or its DOI.
 
 ```bash
-nohup snakemake --sdm conda &
+module load cellranger/9.0.0
+rm nohup.out && nohup snakemake --sdm conda &
+tail -f nohup.out
 ```
 
 ## Deployment options
