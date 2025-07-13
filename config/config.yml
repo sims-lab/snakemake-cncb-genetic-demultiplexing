@@ -29,4 +29,4 @@ bcftools_view:
 cellranger_count:
   cpus: 20
   mem_gb: 40
-  runtime: 2h
+  runtime: 12h
