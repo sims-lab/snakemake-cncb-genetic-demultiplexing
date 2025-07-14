@@ -266,7 +266,8 @@ rule cellranger_count:
         "   --create-bam=true "
         "   --localcores={threads} "
         "   --localmem={resources.mem_gb} && "
-        " mv $TMPDIR/{wildcards.id} {output.cellranger}"
+        " cd - && "
+        " mv $TMPDIR/{wildcards.id} $(dirname $TMPDIR)"
 
 
 # https://snakemake-wrappers.readthedocs.io/en/v7.2.0/wrappers/bio/multiqc.html
