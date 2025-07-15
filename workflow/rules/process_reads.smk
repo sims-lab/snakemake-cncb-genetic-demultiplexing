@@ -245,7 +245,7 @@ rule cellranger_count:
     input:
         lambda wildcards: get_cellranger_count_fastqs(wildcards),
     output:
-        cellranger="results/cellranger_count/{id}",
+        bam="results/cellranger_count/{id}/outs/possorted_genome_bam.bam",
     params:
         genome=config["genome"]["cellranger"],
         sample=lambda wildcards: get_cellranger_count_sample_names(wildcards),
@@ -256,7 +256,7 @@ rule cellranger_count:
         mem_gb=lookup(within=config, dpath="cellranger_count/mem_gb"),
         mem=str(lookup(within=config, dpath="cellranger_count/mem_gb")) + "G",
         runtime=lookup(within=config, dpath="cellranger_count/runtime"),
-        tmpdir="results/cellranger_count/tmp",
+        tmpdir="results/cellranger_count/.tmp",
     shell:
         "cd $TMPDIR && "
         " cellranger count --id={wildcards.id} "
@@ -267,7 +267,7 @@ rule cellranger_count:
         "   --localcores={threads} "
         "   --localmem={resources.mem_gb} && "
         " cd - && "
-        " mv $TMPDIR/{wildcards.id} $(dirname $TMPDIR)"
+        " mv $TMPDIR/{wildcards.id} results/cellranger_count/ "
 
 
 # https://snakemake-wrappers.readthedocs.io/en/v7.2.0/wrappers/bio/multiqc.html
