@@ -270,6 +270,89 @@ rule cellranger_count:
         " mv $TMPDIR/{wildcards.id} results/cellranger_count/ "
 
 
+# index VCF files
+# necessary for filtering VCF files by region later
+# -----------------------------------------------------
+rule bcftools_index_filtered_variants:
+    input:
+        "results/filter_coding_snvs/{sample}.vcf.gz",
+    output:
+        "results/filter_coding_snvs/{sample}.vcf.gz.csi",
+    log:
+        "logs/bcftools_index_filtered_variants/{sample}.log",
+    params:
+        extra="",  # optional parameters for bcftools index
+    wrapper:
+        "v7.2.0/bio/bcftools/index"
+
+
+rule bcftools_merge_filtered_variants:
+    input:
+        calls=expand("results/filter_coding_snvs/{sample}.vcf.gz", sample=dnaseq.index.unique()),
+        idx=expand("results/filter_coding_snvs/{sample}.vcf.gz.csi", sample=dnaseq.index.unique()),
+    output:
+        "results/bcftools_merge_filtered_variants/all.vcf.gz",
+    log:
+        "logs/bcftools_merge_filtered_variants.log",
+    params:
+        uncompressed_bcf=False,
+        extra="",  # optional parameters for bcftools concat (except -o)
+    wrapper:
+        "v7.2.0/bio/bcftools/merge"
+
+
+rule cellsnp_lite:
+    input:
+        bam="results/cellranger_count/{id}/outs/possorted_genome_bam.bam",
+        barcode="results/cellranger_count/{id}/outs/filtered_feature_bc_matrix/barcodes.tsv.gz",
+        vcf="results/bcftools_merge_filtered_variants/all.vcf.gz",
+    output:
+        dir=directory("results/cellsnp_lite/{id}"),
+    log:
+        "results/cellsnp_lite_filtered_barcodes/{id}.log",
+    conda:
+        "../envs/cellsnp_lite.yml",
+    threads: 8
+    resources:
+        mem=lookup(within=config, dpath="cellsnp_lite/mem"),
+        runtime=lookup(within=config, dpath="cellsnp_lite/runtime"),
+    shell:
+        "cellsnp-lite "
+        " -s {input.bam} "
+        " -b {input.barcode} "
+        " -O {output.dir} "
+        " -R {input.vcf} "
+        " -p 8 "
+        " --minMAF 0.1 "
+        " --minCOUNT 20 "
+        " --gzip "
+        " 2> {log} "
+
+
+# rule popscle_dsc:
+#     input:
+#         bam="results/cellranger_count/{id}/outs/possorted_genome_bam.bam",
+#         vcf="results/bcftools_merge_filtered_variants/all.vcf.gz",
+#     output:
+#         pileup="results/popscle_dsc/{id}.pileup",
+#     conda:
+#         "../envs/popscle.yml"
+#     message:
+#         """--- Running popscle dsc-pileup."""
+#     log:
+#         "logs/popscle_dsc/{id}.log",
+#     threads: 1
+#     resources:
+#         mem=lookup(within=config, dpath="popscle_dsc/mem"),
+#         runtime=lookup(within=config, dpath="popscle_dsc/runtime"),
+#     shell:
+#         "popscle dsc-pileup"
+#         " --sam {input.bam}"
+#         " --vcf {input.vcf}"
+#         " --out {output.pileup} > {log} 2>&1 &&"
+#         " touch {output.pileup}"
+
+
 # https://snakemake-wrappers.readthedocs.io/en/v7.2.0/wrappers/bio/multiqc.html
 rule multiqc:
     input:

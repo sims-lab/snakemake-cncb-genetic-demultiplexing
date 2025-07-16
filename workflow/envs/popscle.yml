@@ -1,0 +1,7 @@
+name: popscle
+channels:
+  - bioconda
+  - conda-forge
+  - nodefaults
+dependencies:
+  - popscle=0.1

@@ -30,3 +30,15 @@ cellranger_count:
   cpus: 20
   mem_gb: 40
   runtime: 12h
+
+cellsnp_lite:
+  mem: 16G
+  runtime: 23h
+
+# popscle_dsc:
+#   mem: 128G
+#   runtime: 6h
+
+# popscle_demuxlet:
+#   mem: 48G
+#   runtime: 6h

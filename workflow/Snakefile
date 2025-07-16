@@ -34,7 +34,7 @@ onerror:
 rule all:
     input:
         # expand("results/bwa_mem/{sample}.bam", sample=dnaseq.index.unique()),
-        expand("results/cellranger_count/{id}/outs/possorted_genome_bam.bam", id=scrnaseq.index.unique()),
+        expand("results/cellsnp_lite/{id}", id=scrnaseq.index.unique()),
         "results/mrna_bed/mRNAs.bed",
         "results/multiqc/qc/multiqc.html",
     default_target: True

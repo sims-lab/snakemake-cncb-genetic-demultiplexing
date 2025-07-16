@@ -1,0 +1,7 @@
+name: cellsnp_lite
+channels:
+  - conda-forge # note the importance listing conda-forge first
+  - bioconda
+  - nodefaults
+dependencies:
+  - cellsnp-lite=1.2.3
