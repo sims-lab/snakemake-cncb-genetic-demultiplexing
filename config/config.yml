@@ -32,6 +32,7 @@ cellranger_count:
   runtime: 12h
 
 cellsnp_lite:
+  cpus: 16
   mem: 16G
   runtime: 23h
 

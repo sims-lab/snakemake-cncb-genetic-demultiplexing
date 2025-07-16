@@ -309,10 +309,10 @@ rule cellsnp_lite:
     output:
         dir=directory("results/cellsnp_lite/{id}"),
     log:
-        "results/cellsnp_lite_filtered_barcodes/{id}.log",
+        "results/cellsnp_lite/{id}.log",
     conda:
         "../envs/cellsnp_lite.yml",
-    threads: 8
+    threads: lookup(within=config, dpath="cellsnp_lite/cpus")
     resources:
         mem=lookup(within=config, dpath="cellsnp_lite/mem"),
         runtime=lookup(within=config, dpath="cellsnp_lite/runtime"),
@@ -322,10 +322,29 @@ rule cellsnp_lite:
         " -b {input.barcode} "
         " -O {output.dir} "
         " -R {input.vcf} "
-        " -p 8 "
+        " -p {threads} "
         " --minMAF 0.1 "
         " --minCOUNT 20 "
         " --gzip "
+        " 2> {log} "
+
+
+# TODO: add the outputs of the rule below to the Snakefile target
+rule vireo:
+    input:
+        cellsnp="results/cellsnp_lite/{id}",
+        vcf="results/bcftools_merge_filtered_variants/all.vcf.gz",
+    output:
+        directory("results/vireo/{id}"),
+    log:
+        "results/vireo/{id}.log",
+    conda:
+        "../../envs/vireo.yaml"
+    shell:
+        "vireo "
+        "-c {input.cellsnp}"
+        "-d {input.vcf}"
+        "-o {output}"
         " 2> {log} "
 
 
