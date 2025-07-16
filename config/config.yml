@@ -36,6 +36,11 @@ cellsnp_lite:
   mem: 16G
   runtime: 23h
 
+vireo:
+  cpus: 8
+  mem: 32G
+  runtime: 12h
+
 # popscle_dsc:
 #   mem: 128G
 #   runtime: 6h

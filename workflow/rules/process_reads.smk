@@ -309,7 +309,7 @@ rule cellsnp_lite:
     output:
         dir=directory("results/cellsnp_lite/{id}"),
     log:
-        "results/cellsnp_lite/{id}.log",
+        "logs/cellsnp_lite/{id}.log",
     conda:
         "../envs/cellsnp_lite.yml",
     threads: lookup(within=config, dpath="cellsnp_lite/cpus")
@@ -339,12 +339,16 @@ rule vireo:
     log:
         "results/vireo/{id}.log",
     conda:
-        "../../envs/vireo.yaml"
+        "../envs/vireo.yml"
+    threads: lookup(within=config, dpath="vireo/cpus")
+    resources:
+        mem=lookup(within=config, dpath="vireo/mem"),
+        runtime=lookup(within=config, dpath="vireo/runtime"),
     shell:
         "vireo "
-        "-c {input.cellsnp}"
-        "-d {input.vcf}"
-        "-o {output}"
+        " -c {input.cellsnp}"
+        " -d {input.vcf}"
+        " -o {output}"
         " 2> {log} "
 
 
