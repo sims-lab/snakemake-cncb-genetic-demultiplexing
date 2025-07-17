@@ -28,6 +28,21 @@ rm nohup.out && nohup snakemake --sdm conda &
 tail -f nohup.out
 ```
 
+## RStudio container
+
+On the cluster, with the working directory set in this directory `snakemake-cncb-genetic-demultiplexing/`.
+
+```bash
+sbatch /ceph/project/cncb/albrecht/containers/rserver-2024-job.sh
+cat slurm-*
+```
+
+On the client:
+
+```bash
+connect-to-wn-rstudio-jade.sh
+```
+
 ## Deployment options
 
 To run the workflow from command line, change the working directory.

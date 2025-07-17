@@ -308,6 +308,8 @@ rule cellsnp_lite:
         vcf="results/bcftools_merge_filtered_variants/all.vcf.gz",
     output:
         dir=directory("results/cellsnp_lite/{id}"),
+    params:
+        max_depth=lookup(within=config, dpath="cellsnp_lite/max_depth")
     log:
         "logs/cellsnp_lite/{id}.log",
     conda:
@@ -322,6 +324,7 @@ rule cellsnp_lite:
         " -b {input.barcode} "
         " -O {output.dir} "
         " -R {input.vcf} "
+        " --maxDEPTH {params.max_depth}"
         " -p {threads} "
         " --minMAF 0.1 "
         " --minCOUNT 20 "
