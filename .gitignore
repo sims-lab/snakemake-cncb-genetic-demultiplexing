@@ -12,3 +12,4 @@ workflow/notebooks/.ipynb_checkpoints/**
 **/.RData
 **/Rplots.pdf
 sps-*
+**/*.html

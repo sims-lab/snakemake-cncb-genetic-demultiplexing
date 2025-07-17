@@ -13,6 +13,7 @@ configfile: "config/config.yml"
 # -----------------------------------------------------
 include: "rules/common.smk"
 include: "rules/process_reads.smk"
+include: "rules/reports.smk"
 
 
 # optional messages, log and error handling
@@ -34,7 +35,8 @@ onerror:
 rule all:
     input:
         # expand("results/bwa_mem/{sample}.bam", sample=dnaseq.index.unique()),
-        expand("results/vireo/{id}", id=scrnaseq.index.unique()),
+        # expand("results/vireo/{id}", id=scrnaseq.index.unique()),
+        "reports/report_vireo_all.html",
         "results/mrna_bed/mRNAs.bed",
         "results/multiqc/qc/multiqc.html",
     default_target: True

@@ -1,0 +1,113 @@
+---
+title: "Vireo (sample)"
+output: html_document
+author: "Kevin Rue"
+date: "`r Sys.Date()`"
+---
+
+```{r libraries, include=FALSE}
+library(tidyverse)
+```
+
+```{r setup, include=FALSE}
+# use this code chunk to set up constants
+```
+
+```{r snakemake, include=FALSE}
+# "results/vireo/{id}" (character vector)
+vireo_summary_dirs <- snakemake@input[["summary"]]
+```
+
+```{r vireo_summary_files, include=FALSE}
+# "results/vireo/{id}/summary.tsv" (character vector)
+vireo_summary_files <- file.path(vireo_summary_dirs, "summary.tsv")
+```
+
+## Load data
+
+```{r debug, echo=FALSE}
+load_one_file <- function(path) {
+  res <- read_tsv(path, show_col_types = FALSE)
+  colnames(res) <- c("label", "frequency")
+  res$sample <- basename(dirname(path))
+  res
+}
+vireo_summary_all <- do.call("bind_rows", lapply(vireo_summary_files, load_one_file)) %>%
+  mutate(sample = str_replace(sample, "WPP000_018hrs_", ""))
+vireo_summary_all
+```
+
+<!-- Remove doublets and unassigned -->
+
+```{r vireo_summary_all_assigned, echo=FALSE}
+vireo_summary_all_assigned <- vireo_summary_all %>%
+  filter(!label %in% c("doublet", "unassigned"))
+```
+
+<!-- Order assigned labels by total frequency -->
+
+```{r labels_ordered_by_assigned_cells, echo=FALSE}
+labels_ordered_by_assigned_cells <- vireo_summary_all_assigned %>%
+  group_by(label) %>%
+  summarise(frequency = sum(frequency)) %>%
+  arrange(desc(frequency)) %>%
+  pull(label)
+vireo_summary_all_assigned <- vireo_summary_all_assigned %>%
+  mutate(label = factor(label, labels_ordered_by_assigned_cells))
+```
+
+## Cell assignments compared across samples
+
+```{r ggplot_label_frequency_sample, echo=FALSE}
+ggplot(vireo_summary_all_assigned, aes(x = label, y = frequency, colour = sample)) +
+  geom_point() +
+  geom_line(aes(group = sample)) +
+  scale_y_continuous(limits = c(0, NA)) +
+  labs(
+    x = "Sample",
+    y = "Frequency",
+    title = "Cell assignments compared across samples"
+  ) +
+  theme_bw()
+```
+
+```{r table_label_frequency_sample, echo=FALSE}
+vireo_summary_all_assigned %>% 
+  pivot_wider(names_from = sample, values_from = frequency) %>% 
+  arrange(label)
+```
+
+## Total cell assigned per sample
+
+```{r vireo_summary_all_assigned_total, echo=FALSE}
+vireo_summary_all_assigned_total <- vireo_summary_all_assigned %>%
+  select(-label) %>%
+  group_by(sample) %>%
+  summarise(
+    frequency = sum(frequency)
+  )
+```
+
+```{r ggplot_total_frequency_sample, echo=FALSE}
+ggplot(vireo_summary_all_assigned_total, aes(x = sample, y = frequency, fill = sample)) +
+  geom_col(alpha = 0.5) +
+  scale_y_continuous(limits = c(0, NA)) +
+  labs(
+    x = "Sample",
+    y = "Frequency",
+    title = "Total assignments per sample"
+  ) +
+  theme_bw()
+```
+
+```{r print_vireo_summary_all_assigned_total, echo=FALSE}
+vireo_summary_all_assigned_total
+```
+
+## Session info
+
+`r date()`
+
+```{r session_info, echo=FALSE}
+sessionInfo()
+```
