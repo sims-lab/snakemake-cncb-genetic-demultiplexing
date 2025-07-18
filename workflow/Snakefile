@@ -38,7 +38,7 @@ rule all:
         # expand("results/vireo/{id}", id=scrnaseq.index.unique()),
         "reports/report_vireo_all.html",
         # "Rlib_DropletQC",
-        expand("results/dropletqc_run/{id}.csv", id=scrnaseq.index.unique()),
+        expand("reports/report_dropletqc_vireo/{id}.html", id=scrnaseq.index.unique()),
         "results/mrna_bed/mRNAs.bed",
         "results/multiqc/qc/multiqc.html",
     default_target: True

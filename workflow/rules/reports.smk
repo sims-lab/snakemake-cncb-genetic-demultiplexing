@@ -11,3 +11,21 @@ rule report_vireo_all:
         runtime="5m",
     script:
         "../../notebooks/report_vireo_all.Rmd"
+
+rule report_dropletqc_vireo:
+    input:
+        vireo="results/vireo/{id}",
+        dropletqc="results/dropletqc_run/{id}.csv",
+        cellranger="results/cellranger_count/{id}/outs/possorted_genome_bam.bam",
+    output:
+        "reports/report_dropletqc_vireo/{id}.html",
+    container:
+        "docker://continuumio/miniconda3:24.9.2-0"
+    conda:
+        "../envs/report_dropletqc_vireo.yml"
+    threads: 1
+    resources:
+        mem="8G",
+        runtime="10m",
+    script:
+        "../../notebooks/report_dropletqc_vireo.Rmd"
