@@ -24,7 +24,7 @@ If you use this workflow in a paper, don't forget to give credits to the authors
 
 ```bash
 module load cellranger/9.0.0
-rm nohup.out && nohup snakemake --sdm conda &
+rm nohup.out && nohup snakemake --sdm conda apptainer  &
 tail -f nohup.out
 ```
 

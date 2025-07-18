@@ -37,6 +37,8 @@ rule all:
         # expand("results/bwa_mem/{sample}.bam", sample=dnaseq.index.unique()),
         # expand("results/vireo/{id}", id=scrnaseq.index.unique()),
         "reports/report_vireo_all.html",
+        # "Rlib_DropletQC",
+        expand("results/dropletqc_run/{id}.csv", id=scrnaseq.index.unique()),
         "results/mrna_bed/mRNAs.bed",
         "results/multiqc/qc/multiqc.html",
     default_target: True

@@ -332,7 +332,6 @@ rule cellsnp_lite:
         " 2> {log} "
 
 
-# TODO: add the outputs of the rule below to the Snakefile target
 rule vireo:
     input:
         cellsnp="results/cellsnp_lite/{id}",
@@ -354,6 +353,44 @@ rule vireo:
         " -o {output}"
         " 2> {log} "
 
+
+rule dropletqc_install:
+    output:
+        path=directory("results/Rlib_DropletQC"),
+    container:
+        "docker://bioconductor/bioconductor_docker:RELEASE_3_20"
+    log:
+        "logs/dropletqc_install.log",
+    container:
+        "docker://bioconductor/bioconductor_docker:RELEASE_3_20"
+    # conda:
+    #     "../envs/dropletqc.yml",
+    threads: lookup(within=config, dpath="dropletqc/install/cpus")
+    resources:
+        mem=lookup(within=config, dpath="dropletqc/install/mem"),
+        runtime=lookup(within=config, dpath="dropletqc/install/runtime"),
+    script:
+        "../scripts/dropletqc_install.R"
+    
+
+rule dropletqc_run:
+    input:
+        bam="results/cellranger_count/{id}/outs/possorted_genome_bam.bam",
+        rlib="results/Rlib_DropletQC",
+    output:
+        csv="results/dropletqc_run/{id}.csv",
+    log:
+        "logs/dropletqc_run/{id}.log",
+    container:
+        "docker://bioconductor/bioconductor_docker:RELEASE_3_20"
+    # conda:
+    #     "../envs/dropletqc.yml",
+    threads: lookup(within=config, dpath="dropletqc/run/cpus")
+    resources:
+        mem=lookup(within=config, dpath="dropletqc/run/mem"),
+        runtime=lookup(within=config, dpath="dropletqc/run/runtime"),
+    script:
+        "../scripts/dropletqc_run.R"
 
 # rule popscle_dsc:
 #     input:
