@@ -31,6 +31,17 @@ vireo_file <- file.path(vireo_dir, "donor_ids.tsv")
 cellranger_h5 <- file.path(dirname(cellranger_bam), "filtered_feature_bc_matrix.h5")
 ```
 
+## Information
+
+```{r information, include=FALSE}
+sample_name <- basename(vireo_dir)
+```
+
+- **Sample:** `r sample_name`
+- **CellRanger file:** `r cellranger_h5`
+- **Vireo file:** `r vireo_file`
+- **DropletQC file:** `r dropletqc_csv`
+
 ```{r sce, include=FALSE}
 sce <- read10xCounts(cellranger_h5, col.names = TRUE)
 ```
@@ -63,6 +74,8 @@ cell_stats <- tibble(
   )
 ```
 
+##
+
 ```{r plot_assigned, echo=FALSE}
 ggplot() +
   geom_point(
@@ -81,7 +94,7 @@ ggplot() +
   labs(
     x = "Nuclear fraction",
     y = "UMI sum (log10)",
-    title = "Assigned to donor"
+    title = sprintf("Assigned to donor (%s)", sample_name)
   ) +
   guides(colour = "none") +
   theme_bw()
@@ -104,7 +117,7 @@ ggplot() +
   labs(
     x = "Nuclear fraction",
     y = "UMI sum (log10)",
-    title = "Doublet"
+    title = sprintf("Doublet (%s)", sample_name)
   ) +
   guides(colour = "none") +
   theme_bw()

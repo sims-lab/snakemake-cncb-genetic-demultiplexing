@@ -28,6 +28,12 @@ rm nohup.out && nohup snakemake --sdm conda apptainer  &
 tail -f nohup.out
 ```
 
+## Deploy reports
+
+```bash
+cp -r reports/* /ceph/project/cncb/datashare/albrecht/reports/round2/
+```
+
 ## RStudio container
 
 On the cluster, with the working directory set in this directory `snakemake-cncb-genetic-demultiplexing/`.
