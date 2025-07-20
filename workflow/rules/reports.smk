@@ -1,3 +1,11 @@
+rule cellranger_web_summary:
+    input:
+        "results/cellranger_count/{id}/outs/web_summary.html",
+    output:
+        "reports/cellranger_web_summary/{id}.html",
+    shell:
+        "cp {input} {output}"
+
 rule report_vireo_all:
     input:
         summary=expand("results/vireo/{id}", id=scrnaseq.index.unique()),

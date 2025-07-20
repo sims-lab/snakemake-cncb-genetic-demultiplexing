@@ -246,6 +246,7 @@ rule cellranger_count:
         lambda wildcards: get_cellranger_count_fastqs(wildcards),
     output:
         bam="results/cellranger_count/{id}/outs/possorted_genome_bam.bam",
+        html="results/cellranger_count/{id}/outs/web_summary.html",
     params:
         genome=config["genome"]["cellranger"],
         sample=lambda wildcards: get_cellranger_count_sample_names(wildcards),
