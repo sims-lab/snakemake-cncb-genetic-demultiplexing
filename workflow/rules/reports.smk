@@ -20,13 +20,13 @@ rule report_vireo_all:
     script:
         "../../notebooks/report_vireo_all.Rmd"
 
-rule report_dropletqc_vireo:
+rule report_droplet_filtering_metrics:
     input:
         vireo="results/vireo/{id}",
         dropletqc="results/dropletqc_run/{id}.csv",
         cellranger="results/cellranger_count/{id}/outs/possorted_genome_bam.bam",
     output:
-        "reports/report_dropletqc_vireo/{id}.html",
+        "reports/report_droplet_filtering_metrics/{id}.html",
     container:
         "docker://continuumio/miniconda3:24.9.2-0"
     conda:
@@ -36,13 +36,13 @@ rule report_dropletqc_vireo:
         mem="8G",
         runtime="10m",
     script:
-        "../../notebooks/report_dropletqc_vireo.Rmd"
+        "../../notebooks/report_droplet_filtering_metrics.Rmd"
 
 rule report_index:
     input:
         expand("reports/cellranger_web_summary/{id}.html", id=scrnaseq.index.unique()),
         "reports/report_vireo_all.html",
-        expand("reports/report_dropletqc_vireo/{id}.html", id=scrnaseq.index.unique()),
+        expand("reports/report_droplet_filtering_metrics/{id}.html", id=scrnaseq.index.unique()),
     output:
         "reports/index.html",
     container:

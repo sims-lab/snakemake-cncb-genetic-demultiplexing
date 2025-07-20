@@ -32,12 +32,12 @@ path_all <- grep("report_vireo_all.html", report_paths, value = TRUE)
 cat(sprintf("- [Combined report](%s)", path_all), sep = "\n")
 ```
 
-## CellRanger / Vireo / DropletQC
+## Droplet filtering metrics
 
 <details>
   <summary>Individual reports</summary>
 ```{r, echo=FALSE, results='asis'}
-path_samples <- grep("^report_dropletqc_vireo/", report_paths, value = TRUE)
+path_samples <- grep("^report_droplet_filtering_metrics/", report_paths, value = TRUE)
 names(path_samples) <- fs::path_ext_remove(basename(path_samples))
 cat(sprintf("- [%s](%s)", names(path_samples), path_samples), sep = "\n")
 ```

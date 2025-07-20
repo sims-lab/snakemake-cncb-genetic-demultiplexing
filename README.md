@@ -31,7 +31,7 @@ tail -f nohup.out
 ## Deploy reports
 
 ```bash
-cp -r reports/* /ceph/project/cncb/datashare/albrecht/reports/round2/
+rsync --delete -r reports/* /ceph/project/cncb/datashare/albrecht/reports/round2/
 ```
 
 ## RStudio container

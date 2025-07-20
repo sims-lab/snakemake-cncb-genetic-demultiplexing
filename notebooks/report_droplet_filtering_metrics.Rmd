@@ -1,5 +1,5 @@
 ---
-title: "Vireo (sample)"
+title: "Droplet filtering metrics (sample)"
 output: html_document
 author: "Kevin Rue"
 date: "`r Sys.Date()`"
@@ -74,7 +74,7 @@ cell_stats <- tibble(
   )
 ```
 
-##
+## Plots
 
 ```{r plot_assigned, echo=FALSE}
 ggplot() +
@@ -118,6 +118,29 @@ ggplot() +
     x = "Nuclear fraction",
     y = "UMI sum (log10)",
     title = sprintf("Doublet (%s)", sample_name)
+  ) +
+  guides(colour = "none") +
+  theme_bw()
+```
+
+```{r plot_unassigned, echo=FALSE}
+ggplot() +
+  geom_point(
+    mapping = aes(x = nuclear_fraction, y = log10(sum)),
+    data = cell_stats %>% filter(donor_id != "unassigned"),
+    colour = "#b3b3b3",
+    size = 0.1
+  ) +
+  geom_point(
+    mapping = aes(x = nuclear_fraction, y = log10(sum)),
+    data = cell_stats %>% filter(donor_id == "unassigned"),
+    colour = "#F8766D",
+    size = 0.1
+  ) +
+  labs(
+    x = "Nuclear fraction",
+    y = "UMI sum (log10)",
+    title = sprintf("Unassigned (%s)", sample_name)
   ) +
   guides(colour = "none") +
   theme_bw()
