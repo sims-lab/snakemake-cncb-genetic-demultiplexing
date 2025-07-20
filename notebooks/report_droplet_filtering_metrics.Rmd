@@ -6,7 +6,6 @@ date: "`r Sys.Date()`"
 ---
 
 ```{r libraries, include=FALSE}
-library(DropletUtils)
 library(tidyverse)
 ```
 
@@ -15,20 +14,13 @@ library(tidyverse)
 ```
 
 ```{r snakemake, include=FALSE}
-# "results/vireo/{id}" (character vector)
 vireo_dir <- snakemake@input[["vireo"]]
 dropletqc_csv <- snakemake@input[["dropletqc"]]
-cellranger_bam <- snakemake@input[["cellranger"]]
+cellranger_tsv <- snakemake@input[["cellranger"]]
 ```
 
 ```{r vireo_file, include=FALSE}
-# "results/vireo/{id}/summary.tsv" (character(1))
 vireo_file <- file.path(vireo_dir, "donor_ids.tsv")
-```
-
-```{r cellranger_h5, include=FALSE}
-# "results/cellranger_count/{id}/outs/possorted_genome_bam.bam" (character(1))
-cellranger_h5 <- file.path(dirname(cellranger_bam), "filtered_feature_bc_matrix.h5")
 ```
 
 ## Information
@@ -38,12 +30,12 @@ sample_name <- basename(vireo_dir)
 ```
 
 - **Sample:** `r sample_name`
-- **CellRanger file:** `r cellranger_h5`
+- **CellRanger file:** `r cellranger_tsv`
 - **Vireo file:** `r vireo_file`
 - **DropletQC file:** `r dropletqc_csv`
 
 ```{r sce, include=FALSE}
-sce <- read10xCounts(cellranger_h5, col.names = TRUE)
+cellranger_data <- read_tsv(cellranger_tsv)
 ```
 
 ```{r cell_names, include=FALSE}
@@ -56,28 +48,27 @@ vireo_data <- read_tsv(vireo_file)
 ```
 
 ```{r dropletqc_data, include=FALSE}
-dropletqc_data <- read_csv(dropletqc_csv, col_names = c("cell", "nuclear_fraction"), skip = 1)
+dropletqc_data <- read_csv(dropletqc_csv, col_names = c("barcode", "nuclear_fraction"), skip = 1)
 ```
 
 ```{r cell_stats, include=FALSE}
-cell_stats <- tibble(
-  cell = cell_names,
-  sum = colSums(counts(sce))
-) %>%
+cell_stats <- cellranger_data %>%
   left_join(
     dropletqc_data,
-    by = "cell"
+    by = c("barcode" = "cell")
   ) %>%
   left_join(
     vireo_data,
-    by = "cell"
+    by = "barcode"
   )
 ```
 
 ## Plots
 
+### DropletQC-Vireo
+
 ```{r plot_assigned, echo=FALSE}
-ggplot() +
+plot <- ggplot() +
   geom_point(
     mapping = aes(x = nuclear_fraction, y = log10(sum)),
     data = cell_stats %>% filter(donor_id %in% c("doublet", "unassigned")),
@@ -90,18 +81,19 @@ ggplot() +
     colour = "#F8766D",
     size = 0.1
   ) +
-  geom_point(size = 0.1) +
   labs(
     x = "Nuclear fraction",
     y = "UMI sum (log10)",
-    title = sprintf("Assigned to donor (%s)", sample_name)
+    title = sprintf("Assigned to donor (%s)", sample_name),
+    subtitle = sprintf("%s barcodes", format(sum(!cell_stats$donor_id %in% c("doublet", "unassigned")), big.mark = ","))
   ) +
   guides(colour = "none") +
   theme_bw()
+rasterise(plot, layers = "Point", dpi = 300)
 ```
 
 ```{r plot_doublet, echo=FALSE}
-ggplot() +
+plot <- ggplot() +
   geom_point(
     mapping = aes(x = nuclear_fraction, y = log10(sum)),
     data = cell_stats %>% filter(donor_id != "doublet"),
@@ -117,14 +109,16 @@ ggplot() +
   labs(
     x = "Nuclear fraction",
     y = "UMI sum (log10)",
-    title = sprintf("Doublet (%s)", sample_name)
+    title = sprintf("Doublet (%s)", sample_name),
+    subtitle = sprintf("%s barcodes", format(sum(cell_stats$donor_id == "doublet"), big.mark = ","))
   ) +
   guides(colour = "none") +
   theme_bw()
+rasterise(plot, layers = "Point", dpi = 300)
 ```
 
 ```{r plot_unassigned, echo=FALSE}
-ggplot() +
+plot <- ggplot() +
   geom_point(
     mapping = aes(x = nuclear_fraction, y = log10(sum)),
     data = cell_stats %>% filter(donor_id != "unassigned"),
@@ -140,8 +134,10 @@ ggplot() +
   labs(
     x = "Nuclear fraction",
     y = "UMI sum (log10)",
-    title = sprintf("Unassigned (%s)", sample_name)
+    title = sprintf("Unassigned (%s)", sample_name),
+    subtitle = sprintf("%s barcodes", format(sum(cell_stats$donor_id == "unassigned"), big.mark = ","))
   ) +
   guides(colour = "none") +
   theme_bw()
+rasterise(plot, layers = "Point", dpi = 300)
 ```

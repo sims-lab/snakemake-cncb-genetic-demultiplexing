@@ -24,7 +24,7 @@ rule report_droplet_filtering_metrics:
     input:
         vireo="results/vireo/{id}",
         dropletqc="results/dropletqc_run/{id}.csv",
-        cellranger="results/cellranger_count/{id}/outs/possorted_genome_bam.bam",
+        cellranger="results/cellranger_stats/{id}.tsv",
     output:
         "reports/report_droplet_filtering_metrics/{id}.html",
     container:

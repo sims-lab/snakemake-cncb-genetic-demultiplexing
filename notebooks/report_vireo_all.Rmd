@@ -1,5 +1,5 @@
 ---
-title: "Vireo (sample)"
+title: "Vireo (combined report)"
 output: html_document
 author: "Kevin Rue"
 date: "`r Sys.Date()`"
