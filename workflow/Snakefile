@@ -34,8 +34,7 @@ onerror:
 # -----------------------------------------------------
 rule all:
     input:
-        expand("reports/cellranger_web_summary/{id}.html", id=scrnaseq.index.unique()),
-        expand("reports/report_dropletqc_vireo/{id}.html", id=scrnaseq.index.unique()),
+        "reports/index.html",
         "reports/report_vireo_all.html",
         "results/mrna_bed/mRNAs.bed",
         "results/multiqc/qc/multiqc.html",

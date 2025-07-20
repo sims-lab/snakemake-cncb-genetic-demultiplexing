@@ -1,0 +1,44 @@
+---
+title: "Index page"
+author: "Kevin Rue"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r libraries, include=FALSE}
+library(tidyverse)
+```
+
+```{r snakemake, include=FALSE}
+report_paths <- snakemake@input %>%
+  str_remove("reports/")
+```
+
+## CellRanger count
+
+<details>
+  <summary>Individual reports</summary>
+```{r, echo=FALSE, results='asis'}
+path_samples <- grep("^cellranger_web_summary/", report_paths, value = TRUE)
+names(path_samples) <- fs::path_ext_remove(basename(path_samples))
+cat(sprintf("- [%s](%s)", names(path_samples), path_samples), sep = "\n")
+```
+</details>
+
+## Vireo
+
+```{r, echo=FALSE, results='asis'}
+path_all <- grep("report_vireo_all.html", report_paths, value = TRUE)
+cat(sprintf("- [Combined report](%s)", path_all), sep = "\n")
+```
+
+## CellRanger / Vireo / DropletQC
+
+<details>
+  <summary>Individual reports</summary>
+```{r, echo=FALSE, results='asis'}
+path_samples <- grep("^report_dropletqc_vireo/", report_paths, value = TRUE)
+names(path_samples) <- fs::path_ext_remove(basename(path_samples))
+cat(sprintf("- [%s](%s)", names(path_samples), path_samples), sep = "\n")
+```
+</details>

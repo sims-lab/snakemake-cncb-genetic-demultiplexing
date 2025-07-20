@@ -37,3 +37,21 @@ rule report_dropletqc_vireo:
         runtime="10m",
     script:
         "../../notebooks/report_dropletqc_vireo.Rmd"
+
+rule report_index:
+    input:
+        expand("reports/cellranger_web_summary/{id}.html", id=scrnaseq.index.unique()),
+        "reports/report_vireo_all.html",
+        expand("reports/report_dropletqc_vireo/{id}.html", id=scrnaseq.index.unique()),
+    output:
+        "reports/index.html",
+    container:
+        "docker://continuumio/miniconda3:24.9.2-0"
+    conda:
+        "../envs/report_dropletqc_vireo.yml"
+    threads: 1
+    resources:
+        mem="8G",
+        runtime="10m",
+    script:
+        "../../notebooks/report_index.Rmd"
