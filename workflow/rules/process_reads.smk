@@ -247,6 +247,7 @@ rule cellranger_count:
     output:
         bam="results/cellranger_count/{id}/outs/possorted_genome_bam.bam",
         html="results/cellranger_count/{id}/outs/web_summary.html",
+        filtered="results/cellranger_count/{id}/outs/filtered_feature_bc_matrix.h5",
     params:
         genome=config["genome"]["cellranger"],
         sample=lambda wildcards: get_cellranger_count_sample_names(wildcards),

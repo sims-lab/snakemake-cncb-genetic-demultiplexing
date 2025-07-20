@@ -1,4 +1,4 @@
-name: popscle
+name: dropletutils
 channels:
   - conda-forge
   - bioconda

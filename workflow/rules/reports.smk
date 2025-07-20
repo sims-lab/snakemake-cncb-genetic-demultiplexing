@@ -30,7 +30,7 @@ rule report_dropletqc_vireo:
     container:
         "docker://continuumio/miniconda3:24.9.2-0"
     conda:
-        "../envs/report_dropletqc_vireo.yml"
+        "../envs/dropletutils.yml"
     threads: 1
     resources:
         mem="8G",
@@ -48,7 +48,7 @@ rule report_index:
     container:
         "docker://continuumio/miniconda3:24.9.2-0"
     conda:
-        "../envs/report_dropletqc_vireo.yml"
+        "../envs/dropletutils.yml"
     threads: 1
     resources:
         mem="8G",
