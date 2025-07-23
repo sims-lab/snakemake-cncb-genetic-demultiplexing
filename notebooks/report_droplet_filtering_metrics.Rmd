@@ -34,12 +34,12 @@ sample_name <- basename(vireo_dir)
 - **Vireo file:** `r vireo_file`
 - **DropletQC file:** `r dropletqc_csv`
 
-```{r sce, include=FALSE}
+```{r cellranger_data, include=FALSE}
 cellranger_data <- read_tsv(cellranger_tsv)
 ```
 
 ```{r cell_names, include=FALSE}
-cell_names <- colnames(sce)
+cell_names <- cellranger_data$barcode
 ```
 
 ```{r vireo_data, include=FALSE}
@@ -55,11 +55,11 @@ dropletqc_data <- read_csv(dropletqc_csv, col_names = c("barcode", "nuclear_frac
 cell_stats <- cellranger_data %>%
   left_join(
     dropletqc_data,
-    by = c("barcode" = "cell")
+    by = "barcode"
   ) %>%
   left_join(
     vireo_data,
-    by = "barcode"
+    by = c("barcode" = "cell")
   )
 ```
 

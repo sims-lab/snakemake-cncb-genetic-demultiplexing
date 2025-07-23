@@ -1,0 +1,8 @@
+name: simpleaf
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - macs3=3.0.3
+  - piscem=0.14.2
+  - simpleaf=0.19.5

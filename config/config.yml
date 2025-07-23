@@ -5,6 +5,7 @@ genome:
   fasta: "/ceph/project/cncb/albrecht/snakemake-cncb-index-ensembl-genome/results/genome/genome.fa"
   gtf: "/ceph/project/cncb/albrecht/snakemake-cncb-index-ensembl-genome/results/genome/genome.gtf"
   cellranger: "/ceph/project/cncb/albrecht/snakemake-cncb-index-ensembl-genome/results/cellranger_mkref"
+  simpleaf: "/ceph/project/cncb/albrecht/snakemake-cncb-index-ensembl-genome/results/simpleaf/index"
 
 bwa_mem:
   mem: 16G
@@ -26,7 +27,7 @@ bcftools_view:
   mem: 12G
   runtime: 10m
 
-cellranger_count:
+cellranger:
   cpus: 20
   mem_gb: 40
   runtime: 12h
@@ -51,6 +52,11 @@ dropletqc:
     cpus: 16
     mem: 64G
     runtime: 30m
+
+simpleaf:
+  cpus: 16
+  mem: 16G
+  runtime: 4h
 
 # popscle_dsc:
 #   mem: 128G

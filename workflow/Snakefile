@@ -38,5 +38,6 @@ rule all:
         "reports/index.html",
         "reports/report_vireo_all.html",
         expand("results/cellranger_stats/{id}.tsv", id=scrnaseq.index.unique()),
+        expand("results/simpleaf/{id}", id=scrnaseq.index.unique()),
         "results/multiqc/qc/multiqc.html",
     default_target: True

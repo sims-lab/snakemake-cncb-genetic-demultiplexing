@@ -253,12 +253,11 @@ rule cellranger_count:
         sample=lambda wildcards: get_cellranger_count_sample_names(wildcards),
     message:
         """--- Run cellranger count."""
-    threads: lookup(within=config, dpath="cellranger_count/cpus")
+    threads: lookup(within=config, dpath="cellranger/cpus")
     resources:
-        mem_gb=lookup(within=config, dpath="cellranger_count/mem_gb"),
-        mem=str(lookup(within=config, dpath="cellranger_count/mem_gb")) + "G",
-        runtime=lookup(within=config, dpath="cellranger_count/runtime"),
-        tmpdir="results/cellranger_count/.tmp",
+        mem_gb=lookup(within=config, dpath="cellranger/mem_gb"),
+        mem=str(lookup(within=config, dpath="cellranger/mem_gb")) + "G",
+        runtime=lookup(within=config, dpath="cellranger/runtime"),
     shell:
         "cd $TMPDIR && "
         " cellranger count --id={wildcards.id} "
@@ -417,6 +416,58 @@ rule dropletqc_run:
 #         " --out {output.pileup} > {log} 2>&1 &&"
 #         " touch {output.pileup}"
 
+def get_simpleaf_quant_input_fastqs(wildcards):
+    # throw error if sample not found
+    if wildcards.id not in scrnaseq.index:
+        raise ValueError(f"Sample {wildcards.id} not found in the sample sheet.")
+    sample_fastqs_info=scrnaseq[scrnaseq['id'] == wildcards.id]
+    sample_path=sample_fastqs_info['path'].iloc[0]
+    sample_path_files=os.listdir(sample_path)
+    sample_r1=[os.path.join(sample_path, file) for file in sample_path_files if file.endswith("R1_001.fastq.gz")]
+    sample_r2=[file.replace("R1_001.fastq.gz", "R2_001.fastq.gz") for file in sample_r1]
+    return {
+        'fq1': sample_r1,
+        'fq2': sample_r2,
+    }
+
+
+rule simpleaf:
+    input:
+        unpack(get_simpleaf_quant_input_fastqs),
+        genome=config["genome"]["simpleaf"],
+    output:
+        directory("results/simpleaf/{id}"),
+    params:
+        reads1=lambda wildcards, input: ','.join(input.fq1),
+        reads2=lambda wildcards, input: ','.join(input.fq2),
+    log:
+        "logs/simpleaf/{id}.log",
+    conda:
+        "../envs/simpleaf.yml"
+    message:
+        """--- Run simpleaf quant."""
+    threads: lookup(within=config, dpath="simpleaf/cpus")
+    resources:
+        mem=lookup(within=config, dpath="simpleaf/mem"),
+        runtime=lookup(within=config, dpath="simpleaf/runtime"),
+    shell:
+        "jobdir=$(pwd) && "
+        " cd $TMPDIR && "
+        " export ALEVIN_FRY_HOME=af_home && "
+        " simpleaf set-paths && "
+        " simpleaf quant "
+        " --reads1 {params.reads1} "
+        " --reads2 {params.reads2}"
+        " --index {input.genome}"
+        " --chemistry 10xv4-3p "
+        " --resolution cr-like "
+        " --expected-ori fw "
+        " --unfiltered-pl "
+        " --t2g-map {input.genome}/t2g_3col.tsv"
+        " --threads {threads}"
+        " --output alevin_quant_{wildcards.id}"
+        " 2> $jobdir/{log} &&"
+        " mv alevin_quant_{wildcards.id} $jobdir/{output}"
 
 # https://snakemake-wrappers.readthedocs.io/en/v7.2.0/wrappers/bio/multiqc.html
 rule multiqc:
