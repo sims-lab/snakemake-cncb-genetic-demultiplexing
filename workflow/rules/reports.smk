@@ -30,7 +30,7 @@ rule report_droplet_filtering_metrics:
     container:
         "docker://continuumio/miniconda3:24.9.2-0"
     conda:
-        "../envs/dropletutils.yml"
+        "../envs/report_tidyverse.yml"
     threads: 1
     resources:
         mem="8G",

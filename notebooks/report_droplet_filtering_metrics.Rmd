@@ -6,6 +6,7 @@ date: "`r Sys.Date()`"
 ---
 
 ```{r libraries, include=FALSE}
+library(ggrastr)
 library(tidyverse)
 ```
 

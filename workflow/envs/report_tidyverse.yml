@@ -1,0 +1,8 @@
+name: report_tidyverse
+channels:
+  - conda-forge
+  - bioconda
+  - nodefaults
+dependencies:
+  - r-ggrastr=1.0.2
+  - r-tidyverse=2.0.0
