@@ -74,13 +74,13 @@ plot <- ggplot() +
     mapping = aes(x = nuclear_fraction, y = log10(sum)),
     data = cell_stats %>% filter(donor_id %in% c("doublet", "unassigned")),
     colour = "#b3b3b3",
-    size = 0.1
+    size = 0.05
   ) +
   geom_point(
     mapping = aes(x = nuclear_fraction, y = log10(sum)),
     data = cell_stats %>% filter(!donor_id %in% c("doublet", "unassigned")),
     colour = "#F8766D",
-    size = 0.1
+    size = 0.05
   ) +
   labs(
     x = "Nuclear fraction",
@@ -99,13 +99,13 @@ plot <- ggplot() +
     mapping = aes(x = nuclear_fraction, y = log10(sum)),
     data = cell_stats %>% filter(donor_id != "doublet"),
     colour = "#b3b3b3",
-    size = 0.1
+    size = 0.05
   ) +
   geom_point(
     mapping = aes(x = nuclear_fraction, y = log10(sum)),
     data = cell_stats %>% filter(donor_id == "doublet"),
     colour = "#F8766D",
-    size = 0.1
+    size = 0.05
   ) +
   labs(
     x = "Nuclear fraction",
@@ -124,13 +124,13 @@ plot <- ggplot() +
     mapping = aes(x = nuclear_fraction, y = log10(sum)),
     data = cell_stats %>% filter(donor_id != "unassigned"),
     colour = "#b3b3b3",
-    size = 0.1
+    size = 0.05
   ) +
   geom_point(
     mapping = aes(x = nuclear_fraction, y = log10(sum)),
     data = cell_stats %>% filter(donor_id == "unassigned"),
     colour = "#F8766D",
-    size = 0.1
+    size = 0.05
   ) +
   labs(
     x = "Nuclear fraction",

@@ -1,0 +1,10 @@
+name: cellranger_filtered_stats
+channels:
+  - conda-forge
+  - bioconda
+  - nodefaults
+dependencies:
+  - bioconductor-biocio
+  - bioconductor-dropletutils
+  - bioconductor-rtracklayer
+  - r-tidyverse=2.0.0

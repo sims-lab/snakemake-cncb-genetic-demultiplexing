@@ -1,10 +1,11 @@
 rule cellranger_filtered_stats:
     input:
-        "results/cellranger_count/{id}/outs/filtered_feature_bc_matrix.h5",
+        cellranger="results/cellranger_count/{id}/outs/filtered_feature_bc_matrix.h5",
+        gtf=config["genome"]["gtf"],
     output:
         "results/cellranger_stats/{id}.tsv",
     conda:
-        "../envs/dropletutils.yml"
+        "../envs/cellranger_filtered_stats.yml"
     threads: 2
     resources:
         mem="8G",

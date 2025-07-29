@@ -392,6 +392,27 @@ rule dropletqc_run:
         runtime=lookup(within=config, dpath="dropletqc/run/runtime"),
     script:
         "../scripts/dropletqc_run.R"
+    
+
+# rule dropletqc_empty:
+#     input:
+#         dropletqc_stats="results/dropletqc_run/{id}.csv",
+#         cellranger_stats="results/cellranger_stats/{id}.tsv",
+#         rlib="results/Rlib_DropletQC",
+#     output:
+#         csv=TODO,
+#     log:
+#         "logs/dropletqc_run/{id}.log",
+#     container:
+#         "docker://bioconductor/bioconductor_docker:RELEASE_3_20"
+#     # conda:
+#     #     "../envs/dropletqc.yml",
+#     threads: lookup(within=config, dpath="dropletqc/run/cpus")
+#     resources:
+#         mem=lookup(within=config, dpath="dropletqc/run/mem"),
+#         runtime=lookup(within=config, dpath="dropletqc/run/runtime"),
+#     script:
+#         "../scripts/dropletqc_run.R"
 
 # rule popscle_dsc:
 #     input:
