@@ -82,7 +82,7 @@ plot <- ggplot() +
     x = "Nuclear fraction",
     y = "UMI sum (log10)",
     title = sprintf("DropletQC (%s)", sample_name),
-    subtitle = sprintf("%s barcodes", format(sum(nrow(cell_stats), big.mark = ",")))
+    subtitle = sprintf("%s barcodes", format(nrow(cell_stats), big.mark = ","))
   ) +
   guides(colour = "none") +
   theme_bw()
