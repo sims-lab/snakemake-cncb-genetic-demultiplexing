@@ -68,11 +68,32 @@ cell_stats <- cellranger_data %>%
   )
 ```
 
+## DropletQC
+
+```{r plot_dropletqc, echo=FALSE}
+plot <- ggplot() +
+  geom_point(
+    mapping = aes(x = nuclear_fraction, y = log10(sum)),
+    data = cell_stats,
+    colour = "#b3b3b3",
+    size = 0.05
+  ) +
+  labs(
+    x = "Nuclear fraction",
+    y = "UMI sum (log10)",
+    title = sprintf("DropletQC (%s)", sample_name),
+    subtitle = sprintf("%s barcodes", format(sum(nrow(cell_stats), big.mark = ",")))
+  ) +
+  guides(colour = "none") +
+  theme_bw()
+rasterise(plot, layers = "Point", dpi = 300)
+```
+
 ## Vireo - DropletQC
 
 ### Assigned to a donor
 
-```{r plot_assigned, echo=FALSE}
+```{r plot_dropletqc_vireo_assigned_donor, echo=FALSE}
 plot <- ggplot() +
   geom_point(
     mapping = aes(x = nuclear_fraction, y = log10(sum)),
@@ -99,7 +120,7 @@ rasterise(plot, layers = "Point", dpi = 300)
 
 ### Genetic doublet
 
-```{r plot_doublet, echo=FALSE}
+```{r plot_dropletqc_vireo_assigned_doublet, echo=FALSE}
 plot <- ggplot() +
   geom_point(
     mapping = aes(x = nuclear_fraction, y = log10(sum)),
@@ -126,7 +147,7 @@ rasterise(plot, layers = "Point", dpi = 300)
 
 ### Unassigned
 
-```{r plot_unassigned, echo=FALSE}
+```{r plot_dropletqc_vireo_unassigned, echo=FALSE}
 plot <- ggplot() +
   geom_point(
     mapping = aes(x = nuclear_fraction, y = log10(sum)),
