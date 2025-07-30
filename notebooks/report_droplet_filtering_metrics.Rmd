@@ -1,6 +1,10 @@
 ---
 title: "Droplet filtering metrics (sample)"
-output: html_document
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 4
 author: "Kevin Rue"
 date: "`r Sys.Date()`"
 ---
@@ -64,9 +68,9 @@ cell_stats <- cellranger_data %>%
   )
 ```
 
-## Plots
+## Vireo - DropletQC
 
-### DropletQC-Vireo
+### Assigned to a donor
 
 ```{r plot_assigned, echo=FALSE}
 plot <- ggplot() +
@@ -93,6 +97,8 @@ plot <- ggplot() +
 rasterise(plot, layers = "Point", dpi = 300)
 ```
 
+### Genetic doublet
+
 ```{r plot_doublet, echo=FALSE}
 plot <- ggplot() +
   geom_point(
@@ -117,6 +123,8 @@ plot <- ggplot() +
   theme_bw()
 rasterise(plot, layers = "Point", dpi = 300)
 ```
+
+### Unassigned
 
 ```{r plot_unassigned, echo=FALSE}
 plot <- ggplot() +
