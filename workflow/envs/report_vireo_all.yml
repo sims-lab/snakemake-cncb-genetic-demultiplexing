@@ -1,0 +1,9 @@
+name: report_vireo_all
+channels:
+  - conda-forge
+  - bioconda
+  - nodefaults
+dependencies:
+  - bioconductor-dropletutils
+  - r-kableextra=1.4.0
+  - r-tidyverse=2.0.0

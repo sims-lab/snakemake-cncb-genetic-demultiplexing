@@ -8,14 +8,15 @@ rule cellranger_web_summary:
 
 rule report_vireo_all:
     input:
-        summary=expand("results/vireo/{id}", id=scrnaseq.index.unique()),
+        vireo=expand("results/vireo/{id}", id=scrnaseq.index.unique()),
+        cellranger=expand("results/cellranger_count/{id}/outs/filtered_feature_bc_matrix.h5", id=scrnaseq.index.unique()),
     output:
         "reports/report_vireo_all.html",
     conda:
-        "../envs/tidyverse.yml"
+        "../envs/report_vireo_all.yml"
     threads: 1
     resources:
-        mem="2G",
+        mem="4G",
         runtime="5m",
     script:
         "../../notebooks/report_vireo_all.Rmd"

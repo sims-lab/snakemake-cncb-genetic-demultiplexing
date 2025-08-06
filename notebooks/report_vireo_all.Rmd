@@ -1,11 +1,17 @@
 ---
 title: "Vireo (combined report)"
-output: html_document
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 4
 author: "Kevin Rue"
 date: "`r Sys.Date()`"
 ---
 
 ```{r libraries, include=FALSE}
+library(DropletUtils)
+library(kableExtra)
 library(tidyverse)
 ```
 
@@ -15,12 +21,13 @@ library(tidyverse)
 
 ```{r snakemake, include=FALSE}
 # "results/vireo/{id}" (character vector)
-vireo_summary_dirs <- snakemake@input[["summary"]]
+vireo_result_dirs <- snakemake@input[["vireo"]]
+cellranger_h5_files <- snakemake@input[["cellranger"]]
 ```
 
 ```{r vireo_summary_files, include=FALSE}
 # "results/vireo/{id}/summary.tsv" (character vector)
-vireo_summary_files <- file.path(vireo_summary_dirs, "summary.tsv")
+vireo_summary_files <- file.path(vireo_result_dirs, "summary.tsv")
 ```
 
 ## Load data
@@ -34,7 +41,8 @@ load_one_file <- function(path) {
 }
 vireo_summary_all <- do.call("bind_rows", lapply(vireo_summary_files, load_one_file)) %>%
   mutate(sample = str_replace(sample, "WPP000_018hrs_", ""))
-vireo_summary_all
+vireo_summary_all %>%
+  select(sample, label, frequency)
 ```
 
 <!-- Remove doublets and unassigned -->
@@ -74,7 +82,8 @@ ggplot(vireo_summary_all_assigned, aes(x = label, y = frequency, colour = sample
 ```{r table_label_frequency_sample, echo=FALSE}
 vireo_summary_all_assigned %>% 
   pivot_wider(names_from = sample, values_from = frequency) %>% 
-  arrange(label)
+  arrange(label) %>%
+  knitr::kable(format.args = list(big.mark = ","))
 ```
 
 ## Total cell assigned per sample
@@ -101,7 +110,61 @@ ggplot(vireo_summary_all_assigned_total, aes(x = sample, y = frequency, fill = s
 ```
 
 ```{r print_vireo_summary_all_assigned_total, echo=FALSE}
-vireo_summary_all_assigned_total
+vireo_summary_all_assigned_total %>%
+  knitr::kable(format.args = list(big.mark = ",")) %>% 
+  kableExtra::kable_styling(full_width = FALSE)
+```
+
+## Expression of sex genes by donor
+
+Quality control: Within each demultiplexed sample, all cells should be male or female.
+
+```{r sce, echo=FALSE}
+names(cellranger_h5_files) <- str_replace(basename(dirname(dirname(cellranger_h5_files))), ".+_", "")
+sce <- read10xCounts(samples = cellranger_h5_files)
+colnames(sce) <- paste0(sce$Barcode, "-", sce$Sample)
+# sce
+```
+
+```{r donor_ids, echo=FALSE}
+vireo_donor_files <- file.path(vireo_result_dirs, "donor_ids.tsv")
+load_one_donor_file <- function(path) {
+  res <- read_tsv(path, show_col_types = FALSE)
+  res$sample <- basename(dirname(path))
+  res
+}
+vireo_donor_all <- do.call("bind_rows", lapply(vireo_donor_files, load_one_donor_file)) %>%
+  mutate(sample = str_replace(sample, "WPP000_018hrs_", "")) %>% 
+  mutate(barcode = paste0(cell, "-", sample))
+stopifnot(all(vireo_donor_all$barcode %in% colnames(sce)))
+stopifnot(all(colnames(sce) %in% vireo_donor_all$barcode))
+stopifnot(!any(duplicated(colnames(sce))))
+stopifnot(!any(duplicated(vireo_donor_all$barcode)))
+# vireo_donor_all
+```
+
+```{r coldata_donor_id, echo=FALSE}
+colData(sce)[vireo_donor_all$barcode, "donor_id"] <- vireo_donor_all$donor_id
+```
+
+```{r plot_rox2_by_donor, fig.height=6, fig.width=9, echo=FALSE, warning=FALSE}
+gene_id <- "FBgn0019660"
+gene_name <- rowData(sce)[gene_id, "Symbol"]
+plot_data <- tibble(
+  counts = counts(sce)[gene_id,],
+  donor_id = colData(sce)[["donor_id"]]
+)
+ggplot() +
+  geom_violin(aes(x = donor_id, y = counts, fill = donor_id), data = plot_data, scale = "width") +
+  scale_y_log10() +
+  labs(
+    title = sprintf("%s | %s", gene_id, gene_name),
+    subtitle = "UMI counts"
+  ) +
+  theme_bw() +
+  theme(
+    axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)
+  )
 ```
 
 ## Session info
