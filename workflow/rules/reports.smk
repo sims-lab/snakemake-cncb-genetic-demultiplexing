@@ -1,15 +1,15 @@
 rule cellranger_web_summary:
     input:
-        "results/cellranger_count/{id}/outs/web_summary.html",
+        "results/cellranger_count/{id}",
     output:
         "reports/cellranger_web_summary/{id}.html",
     shell:
-        "cp {input} {output}"
+        "cp {input}/outs/web_summary.html {output}"
 
 rule report_vireo_all:
     input:
         vireo=expand("results/vireo/{id}", id=scrnaseq.index.unique()),
-        cellranger=expand("results/cellranger_count/{id}/outs/filtered_feature_bc_matrix.h5", id=scrnaseq.index.unique()),
+        cellranger=expand("results/cellranger_count/{id}", id=scrnaseq.index.unique()),
     output:
         "reports/report_vireo_all.html",
     conda:
@@ -20,6 +20,23 @@ rule report_vireo_all:
         runtime="5m",
     script:
         "../../notebooks/report_vireo_all.Rmd"
+
+rule report_dropletqc_all:
+    input:
+        dropletqc=expand("results/dropletqc_run/{id}.csv", id=scrnaseq.index.unique()),
+        vireo=expand("results/vireo/{id}", id=scrnaseq.index.unique()),
+        cellranger=expand("results/cellranger_stats/{id}", id=scrnaseq.index.unique()),
+        samples=config["samplesheet"],
+    output:
+        "reports/report_dropletqc_all.html",
+    conda:
+        "../envs/reports.yml"
+    threads: 1
+    resources:
+        mem="4G",
+        runtime="10m",
+    script:
+        "../../notebooks/report_dropletqc_all.Rmd"
 
 rule report_droplet_filtering_metrics:
     input:

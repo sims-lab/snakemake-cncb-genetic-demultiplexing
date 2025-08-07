@@ -9,25 +9,26 @@ author: "Kevin Rue"
 date: "`r Sys.Date()`"
 ---
 
-```{r libraries, include=FALSE}
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE
+)
 library(DropletUtils)
 library(kableExtra)
 library(tidyverse)
 ```
 
-```{r setup, include=FALSE}
-# use this code chunk to set up constants
-```
-
-```{r snakemake, include=FALSE}
-# "results/vireo/{id}" (character vector)
+```{r snakemake}
 vireo_result_dirs <- snakemake@input[["vireo"]]
-cellranger_h5_files <- snakemake@input[["cellranger"]]
+cellranger_result_dirs <- snakemake@input[["cellranger"]]
 ```
 
-```{r vireo_summary_files, include=FALSE}
-# "results/vireo/{id}/summary.tsv" (character vector)
+```{r vireo_summary_files}
 vireo_summary_files <- file.path(vireo_result_dirs, "summary.tsv")
+```
+
+```{r cellranger_h5_files}
+cellranger_h5_files <- file.path(cellranger_result_dirs, "outs", "filtered_feature_bc_matrix.h5")
 ```
 
 ## Load data

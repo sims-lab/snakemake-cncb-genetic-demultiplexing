@@ -245,9 +245,7 @@ rule cellranger_count:
     input:
         lambda wildcards: get_cellranger_count_fastqs(wildcards),
     output:
-        bam="results/cellranger_count/{id}/outs/possorted_genome_bam.bam",
-        html="results/cellranger_count/{id}/outs/web_summary.html",
-        filtered="results/cellranger_count/{id}/outs/filtered_feature_bc_matrix.h5",
+        cellranger="results/cellranger_count/{id}",
     params:
         genome=config["genome"]["cellranger"],
         sample=lambda wildcards: get_cellranger_count_sample_names(wildcards),
@@ -304,8 +302,7 @@ rule bcftools_merge_filtered_variants:
 
 rule cellsnp_lite:
     input:
-        bam="results/cellranger_count/{id}/outs/possorted_genome_bam.bam",
-        barcode="results/cellranger_count/{id}/outs/filtered_feature_bc_matrix/barcodes.tsv.gz",
+        cellranger="results/cellranger_count/{id}",
         vcf="results/bcftools_merge_filtered_variants/all.vcf.gz",
     output:
         dir=directory("results/cellsnp_lite/{id}"),
@@ -321,8 +318,8 @@ rule cellsnp_lite:
         runtime=lookup(within=config, dpath="cellsnp_lite/runtime"),
     shell:
         "cellsnp-lite "
-        " -s {input.bam} "
-        " -b {input.barcode} "
+        " -s {input.cellranger}/outs/possorted_genome_bam.bam "
+        " -b {input.cellranger}/outs/filtered_feature_bc_matrix/barcodes.tsv.gz "
         " -O {output.dir} "
         " -R {input.vcf} "
         # " --maxDEPTH {params.max_depth}"
@@ -376,7 +373,7 @@ rule dropletqc_install:
 
 rule dropletqc_run:
     input:
-        bam="results/cellranger_count/{id}/outs/possorted_genome_bam.bam",
+        cellranger="results/cellranger_count/{id}",
         rlib="results/Rlib_DropletQC",
     output:
         csv="results/dropletqc_run/{id}.csv",

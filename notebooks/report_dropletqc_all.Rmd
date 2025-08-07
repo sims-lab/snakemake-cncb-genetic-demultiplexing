@@ -1,0 +1,119 @@
+---
+title: "Demultiplexed DropletQC results (all)"
+author: "Kevin Rue"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 4
+---
+
+```{r, setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE
+)
+library(tidyverse)
+library(ggrastr)
+```
+
+```{r snakemake}
+dropletqc_files <- snakemake@input[["dropletqc"]]
+vireo_dirs <- snakemake@input[["vireo"]]
+cellranger_dirs <- snakemake@input[["cellranger"]]
+samples_file <- snakemake@input[["samples"]]
+```
+
+```{r dropletqc_all}
+read_dropletqc_file <- function(file) {
+  tenx_sample <- str_remove(str_remove(basename(file), ".csv"), "WPP000_018hrs_")
+  x <- read_csv(file = file, col_names = c("barcode", "nuclear_fraction"), show_col_types = FALSE, skip = 1) %>% 
+    mutate(barcode_sample = paste0(barcode, "_", tenx_sample))
+  x
+}
+dropletqc_all <- bind_rows(lapply(dropletqc_files, read_dropletqc_file))
+```
+
+```{r vireo_all}
+read_vireo_file <- function(dir) {
+  tenx_sample <- str_remove(basename(dir), "WPP000_018hrs_")
+  file <- file.path(dir, "donor_ids.tsv")
+  x <- read_tsv(file = file, col_select = c(cell, donor_id), show_col_types = FALSE) %>% 
+    filter(!donor_id %in% c("doublet", "unassigned")) %>% 
+    mutate(barcode_sample = paste0(cell, "_", tenx_sample))
+  x
+}
+vireo_all <- bind_rows(lapply(vireo_dirs, read_vireo_file))
+```
+
+```{r cellranger_all}
+read_cellranger_file <- function(file) {
+  tenx_sample <- str_remove(str_remove(basename(file), ".tsv"), "WPP000_018hrs_")
+  x <- read_tsv(file = file, col_select = c(barcode, sum), show_col_types = FALSE) %>% 
+    mutate(barcode_sample = paste0(barcode, "_", tenx_sample))
+  x
+}
+cellranger_all <- bind_rows(lapply(cellranger_dirs, read_cellranger_file))
+```
+
+```{r sample_info}
+sample_info <- read_tsv(samples_file, show_col_types = FALSE) %>% 
+  mutate(
+    sex = factor(sex),
+    dissector = factor(dissector),
+    timepoint = factor(str_remove(dev_label, "WPPp")),
+    DGRP = fct_reorder(DGRP, timepoint, identity)
+  )
+```
+
+```{r stopifnot}
+stopifnot(all(vireo_all$barcode_sample %in% dropletqc_all$barcode_sample))
+stopifnot(all(vireo_all$barcode_sample %in% cellranger_all$barcode_sample))
+stopifnot(all(vireo_all$donor_id %in% sample_info$DGRP))
+```
+
+```{r vireo_dropletqc_cellranger}
+vireo_dropletqc_cellranger <- vireo_all %>% 
+  left_join(dropletqc_all, by = "barcode_sample") %>% 
+  left_join(cellranger_all, by = "barcode_sample") %>% 
+  left_join(sample_info, by = join_by(donor_id == DGRP)) %>% 
+  mutate(
+    donor_id = fct_reorder(donor_id, timepoint, unique)
+  )
+```
+
+## Nuclear fraction
+
+```{r, fig.height=20, fig.width=20}
+ggplot() +
+  geom_point(
+    mapping = aes(
+      x = nuclear_fraction,
+      y = log10(sum),
+      colour = timepoint
+    ),
+    data = vireo_dropletqc_cellranger,
+    size = 0.01
+  ) +
+  facet_wrap(~donor_id) +
+  guides(
+    colour = guide_legend(override.aes = list(size = 3))
+  ) +
+  labs(
+    x = "Nuclear fraction (DropletQC)",
+    y = "UMI sum (log10)",
+    colour = "Dev. label"
+  ) +
+  theme_bw() +
+  theme(
+    text = element_text(size = 20)
+  )
+```
+
+## Session info
+
+`r date()`
+
+```{r session_info, echo=FALSE}
+sessionInfo()
+```

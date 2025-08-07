@@ -1,3 +1,4 @@
+samplesheet: "config/samples.tsv"
 dnaseq_samplesheet: "config/dnaseq.tsv"
 scrnaseq_samplesheet: "config/scrnaseq.tsv"
 

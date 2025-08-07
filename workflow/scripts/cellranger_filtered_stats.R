@@ -2,7 +2,7 @@ library(DropletUtils)
 library(rtracklayer)
 library(tidyverse)
 
-cellranger_h5 <- snakemake@input[["cellranger"]]
+cellranger_h5 <- file.path(snakemake@input[["cellranger"]], "outs", "filtered_feature_bc_matrix.h5")
 gtf_file <- snakemake@input[["gtf"]]
 
 message("Loading H5 file ...")

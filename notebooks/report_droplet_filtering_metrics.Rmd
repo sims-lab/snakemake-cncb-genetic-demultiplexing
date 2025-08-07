@@ -171,3 +171,11 @@ plot <- ggplot() +
   theme_bw()
 rasterise(plot, layers = "Point", dpi = 300)
 ```
+
+## Session info
+
+`r date()`
+
+```{r session_info, echo=FALSE}
+sessionInfo()
+```

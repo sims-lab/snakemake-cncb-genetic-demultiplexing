@@ -1,6 +1,6 @@
 rule cellranger_filtered_stats:
     input:
-        cellranger="results/cellranger_count/{id}/outs/filtered_feature_bc_matrix.h5",
+        cellranger="results/cellranger_count/{id}",
         gtf=config["genome"]["gtf"],
     output:
         "results/cellranger_stats/{id}.tsv",
