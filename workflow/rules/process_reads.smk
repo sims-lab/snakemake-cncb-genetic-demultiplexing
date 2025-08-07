@@ -245,7 +245,7 @@ rule cellranger_count:
     input:
         lambda wildcards: get_cellranger_count_fastqs(wildcards),
     output:
-        cellranger="results/cellranger_count/{id}",
+        cellranger=directory("results/cellranger_count/{id}"),
     params:
         genome=config["genome"]["cellranger"],
         sample=lambda wildcards: get_cellranger_count_sample_names(wildcards),
