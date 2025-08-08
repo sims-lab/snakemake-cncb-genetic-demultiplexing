@@ -20,7 +20,7 @@ library(ggrastr)
 ```{r snakemake}
 dropletqc_files <- snakemake@input[["dropletqc"]]
 vireo_dirs <- snakemake@input[["vireo"]]
-cellranger_dirs <- snakemake@input[["cellranger"]]
+cellranger_files <- snakemake@input[["cellranger"]]
 samples_file <- snakemake@input[["samples"]]
 ```
 
@@ -53,7 +53,7 @@ read_cellranger_file <- function(file) {
     mutate(barcode_sample = paste0(barcode, "_", tenx_sample))
   x
 }
-cellranger_all <- bind_rows(lapply(cellranger_dirs, read_cellranger_file))
+cellranger_all <- bind_rows(lapply(cellranger_files, read_cellranger_file))
 ```
 
 ```{r sample_info}

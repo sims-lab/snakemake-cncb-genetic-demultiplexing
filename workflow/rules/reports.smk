@@ -25,7 +25,7 @@ rule report_dropletqc_all:
     input:
         dropletqc=expand("results/dropletqc_run/{id}.csv", id=scrnaseq.index.unique()),
         vireo=expand("results/vireo/{id}", id=scrnaseq.index.unique()),
-        cellranger=expand("results/cellranger_stats/{id}", id=scrnaseq.index.unique()),
+        cellranger=expand("results/cellranger_stats/{id}.tsv", id=scrnaseq.index.unique()),
         samples=config["samplesheet"],
     output:
         "reports/report_dropletqc_all.html",
