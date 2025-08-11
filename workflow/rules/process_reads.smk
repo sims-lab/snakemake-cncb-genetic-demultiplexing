@@ -154,6 +154,7 @@ rule haplotype_caller:
     input:
         # single or list of bam files
         bam="results/samtools_sort/{sample}.bam",
+        idx="results/samtools_sort/{sample}.bam.bai",
         ref=config["genome"]["fasta"],
     output:
         vcf="results/haplotype_caller/{sample}.vcf.gz",
@@ -306,8 +307,8 @@ rule cellsnp_lite:
         vcf="results/bcftools_merge_filtered_variants/all.vcf.gz",
     output:
         dir=directory("results/cellsnp_lite/{id}"),
-    # params:
-    #     max_depth=lookup(within=config, dpath="cellsnp_lite/max_depth")
+    params:
+        max_depth=lookup(within=config, dpath="cellsnp_lite/max_depth")
     log:
         "logs/cellsnp_lite/{id}.log",
     conda:
@@ -322,7 +323,7 @@ rule cellsnp_lite:
         " -b {input.cellranger}/outs/filtered_feature_bc_matrix/barcodes.tsv.gz "
         " -O {output.dir} "
         " -R {input.vcf} "
-        # " --maxDEPTH {params.max_depth}"
+        " --maxDEPTH {params.max_depth}"
         " -p {threads} "
         " --minMAF 0.1 "
         " --minCOUNT 20 "
@@ -355,14 +356,10 @@ rule vireo:
 rule dropletqc_install:
     output:
         path=directory("results/Rlib_DropletQC"),
-    container:
-        "docker://bioconductor/bioconductor_docker:RELEASE_3_20"
     log:
         "logs/dropletqc_install.log",
     container:
         "docker://bioconductor/bioconductor_docker:RELEASE_3_20"
-    # conda:
-    #     "../envs/dropletqc.yml",
     threads: lookup(within=config, dpath="dropletqc/install/cpus")
     resources:
         mem=lookup(within=config, dpath="dropletqc/install/mem"),

@@ -29,12 +29,12 @@ bcftools_view:
   runtime: 10m
 
 cellranger:
-  cpus: 20
+  cpus: 10
   mem_gb: 40
-  runtime: 12h
+  runtime: 24h
 
 cellsnp_lite:
-  # max_depth: 100
+  max_depth: 100
   cpus: 16
   mem: 16G
   runtime: 23h
