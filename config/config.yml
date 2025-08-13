@@ -34,7 +34,7 @@ cellranger:
   runtime: 24h
 
 cellsnp_lite:
-  max_depth: 100
+  max_depth: 1000
   cpus: 16
   mem: 16G
   runtime: 23h

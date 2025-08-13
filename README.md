@@ -28,7 +28,7 @@ rm nohup.out && nohup snakemake --sdm conda apptainer  &
 tail -f nohup.out
 ```
 
-## Deploy reports
+Copy reports to datashare.
 
 ```bash
 rsync --delete -r reports/* /ceph/project/cncb/datashare/albrecht/reports/round2/
